@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from typing import Union
 from jose import JWTError, jwt
 
-from db.models import User, Token, TokenData
+from db.schemas import User, Token, TokenData
 from auth_info import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 
 router = APIRouter(
