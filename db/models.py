@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Sequence
 
 from .database import Base
 
@@ -6,7 +6,8 @@ from .database import Base
 class Hotel(Base):
     __tablename__ = "hotel"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    member_id = Column(Integer)
     hotel_name = Column(String)
     regulation = Column(String)
     city = Column(String)
