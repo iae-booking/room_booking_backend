@@ -4,7 +4,10 @@ from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from typing import Union
 from jose import JWTError, jwt
+from sqlalchemy.orm import Session
 
+from db import crud, schemas
+from db.database import SessionLocal
 from db.schemas import User, Token, TokenData
 from auth_info import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 
@@ -23,25 +26,35 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 fake_user_db = {
     "nary": {
-        "username": "nary",
+        "email": "nary@mail.com",
         "password": "$2b$12$ltlzMGdm63UrNfp76bbk8.Fuj.d8ajw/4Z3P9uIahrromZHqFpWb.",
     },
 }
 
 
-def auth_user(fake_user_db, username: str, password: str):
-    user = get_user(fake_user_db, username)
-    if not user:
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+def auth_user(db, email: str, password: str):
+    users = crud.get_user(db, email)
+    if len(users) < 1:
         return False
+    user = users[0]
+    print(user.password)
     if not verify_password(password, user.password):
         return False
     return user
 
 
-def get_user(db, username: str):
-    if username in db:
-        user_dict = db[username]
-        return User(**user_dict)
+# def get_user(db, username: str):
+#     if username in db:
+#         user_dict = db[username]
+#         return User(**user_dict)
 
 
 def verify_password(passward, hashed_password):
@@ -59,7 +72,7 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
     return encoded_jwt
 
 
-async def get_current_user(token: str = Depends(oauth2_scheme)):
+async def get_current_user(db, token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -73,7 +86,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         token_data = TokenData(username=username)
     except JWTError:
         raise credentials_exception
-    user = get_user(fake_user_db, username=token_data.username)
+    user = crud.get_user(db, token_data.username) # get_user(fake_user_db, username=token_data.username)
     if user is None:
         raise credentials_exception
     return user
@@ -83,9 +96,24 @@ def hash_password(password):
     return pwd_context.hash(password)
 
 
+@router.post("/register")
+def register(user_info: schemas.User, db: Session = Depends(get_db)):
+    # check if username exist
+    result = crud.get_user(db, user_info.dict()["email"])
+    if(len(result) != 0):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="email already exist",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    user_info.password = hash_password(user_info.password)
+    member = crud.creat_account(db, user_info)
+    return member
+
+
 @router.post("/login", response_model=Token)
-def login(form_data: OAuth2PasswordRequestForm = Depends()):
-    user = auth_user(fake_user_db, form_data.username, form_data.password)
+def login(db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = Depends()):
+    user = auth_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -94,7 +122,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
         )
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user.username}, expires_delta=access_token_expires
+        data={"sub": user.email}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
 

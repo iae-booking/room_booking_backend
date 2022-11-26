@@ -17,7 +17,14 @@ class Hotel(Base):
     image_path = Column(String)
     member_id = Column(Integer, ForeignKey("member.member_id"))
 
-class member(Base):
+class Member(Base):
     __tablename__ = "member"
     # todo fill in the rest of this table
+    email = Column(String)
     member_id = Column(Integer, primary_key=True)
+    password = Column(String)
+    name = Column(String)
+    gender = Column(Integer)
+    phone = Column(String)
+    member_type = Column(Integer)
+    # credit_cards = Column(String)
