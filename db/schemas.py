@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from typing import Union
 
 class OrmBaseModel(BaseModel):
@@ -6,8 +6,12 @@ class OrmBaseModel(BaseModel):
         orm_mode = True
 
 class User(OrmBaseModel):
-    username: str
+    email: EmailStr
     password: str
+    name: str
+    gender: int
+    phone: Union[str, None] = None
+    member_type: int
 
 class Token(OrmBaseModel):
     access_token: str
