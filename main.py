@@ -2,6 +2,7 @@ from fastapi import Depends, FastAPI, HTTPException
 from router import hello, auth, hotels
 from db import models
 from db.database import engine
+from mangum import Mangum
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -14,3 +15,5 @@ app.include_router(hotels.router)
 @app.get('/')
 def home():
     return "This is the entry point"
+
+handler = Mangum(app=app)
