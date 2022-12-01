@@ -24,7 +24,7 @@ jobs:
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
       # Step 3
       - name: Install Python Virtual ENV
-        run: docker build -t 550231130425.dkr.ecr.eu-west-1.amazonaws.com/fastapi-aws-lambda:latest -f Dockerfile.aws.lambda
+        run: docker build -t 550231130425.dkr.ecr.eu-west-1.amazonaws.com/fastapi-aws-lambda:latest .
       # Step 3
       - name: Install Python Virtual ENV
         run: aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin 550231130425.dkr.ecr.eu-west-1.amazonaws.com
