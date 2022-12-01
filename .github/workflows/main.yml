@@ -77,6 +77,12 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: api
+      - name: Deploy new Lambda
+        run: aws configure list
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
   # Step 3
       - name: Upload to S3
         run: aws s3 cp api.zip s3://aws-us-east-1-550231130425-room-booking-backend-pipe/api.zip
