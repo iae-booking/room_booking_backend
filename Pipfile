@@ -10,6 +10,7 @@ passlib = {extras = ["bcrypt"], version = "*"}
 pytest = "*"
 sqlalchemy = "*"
 psycopg2 = "*"
+mangum = "*"
 
 [dev-packages]
 
