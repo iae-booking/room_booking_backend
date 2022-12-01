@@ -78,7 +78,7 @@ jobs:
         with:
           name: api
       - name: Deploy new Lambda
-        run: aws configure list
+        run: zipinfo api.zip
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
