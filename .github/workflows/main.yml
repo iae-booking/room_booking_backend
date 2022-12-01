@@ -13,53 +13,28 @@ jobs:
     steps:
       # Step 1
       - uses: actions/checkout@v2
-
-      # Step 2
-      - name: Set up Python
-        uses: actions/setup-python@v2
+      # Step 1
+      - name: Install AWS CLI
+        uses: unfor19/install-aws-cli-action@v1
         with:
-          python-version: 3.7
-          architecture: x64
+          version: 1
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
       # Step 3
       - name: Install Python Virtual ENV
-        run: pip3 install virtualenv
-      # Step 4
-      - name:  Setup Virtual env
-        uses: actions/cache@v2
-        id: cache-venv
-        with:
-          path: venv
-          key: ${{ runner.os }}-venv-${{ hashFiles('**/requirements*.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-venv-
-      # Step 5
-      - name: Activate and Install Depencies into Virtual env
-        run: python -m venv venv && source venv/bin/activate &&
-          pip3 install -r requirements.txt
-        if: steps.cache-venv.outputs.cache-hit != 'true'
-      # Step 6
-      - name: Activate venv and Run Test
-        run: . venv/bin/activate #&& pytest
-
-      # Step 7
-      - name: Create Zipfile archive of Dependencies
-        run: |
-          cd ./venv/lib/python3.7/site-packages
-          zip -r9 ../../../../api.zip .
-
-      # Step 8
-      - name: Add App to Zip file
-        run: ls
-      # Step 8
-      - name: Add App to Zip file
-        run: zip -g ./api.zip -r .
-
-      # Step 9
-      - name: Upload zip file artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: api
-          path: api.zip
+        run: docker build -t 550231130425.dkr.ecr.eu-west-1.amazonaws.com/fastapi-aws-lambda:latest 。-f Dockerfile.aws.lambda
+      # Step 3
+      - name: Install Python Virtual ENV
+        run: aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin 550231130425.dkr.ecr.eu-west-1.amazonaws.com
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      # Step 3
+      - name: Install Python Virtual ENV
+        run: docker push 550231130425.dkr.ecr.eu-west-1.amazonaws.com/fastapi-aws-lambda:latest
 
   continuous-deployment:
     runs-on: ubuntu-latest
