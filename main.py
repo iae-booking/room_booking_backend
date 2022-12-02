@@ -16,4 +16,4 @@ app.include_router(hotels.router)
 def home():
     return "This is the entry point"
 
-handler = Mangum(app=app)
+handler = Mangum(app=app, spec_version=2)
