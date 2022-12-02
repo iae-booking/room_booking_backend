@@ -11,6 +11,7 @@ pytest = "*"
 sqlalchemy = "*"
 psycopg2 = "*"
 mangum = "*"
+starlette = "*"
 
 [dev-packages]
 
