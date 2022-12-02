@@ -38,6 +38,13 @@ jobs:
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
       # Step 3
       - name: Install Python Virtual ENV
+        run: echo
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      # Step 3
+      - name: Install Python Virtual ENV
         run: docker push 550231130425.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/fastapi-aws-lambda:latest
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
