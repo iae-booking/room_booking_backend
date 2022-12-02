@@ -4,4 +4,4 @@ RUN ls
 RUN yum install postgresql-devel* -y
 RUN yum install gcc -y
 RUN pip install -r ./requirements.txt
-CMD ["main.app.handler"]
+CMD ["main.handler"]
