@@ -6,7 +6,7 @@ from mangum import Mangum
 
 models.Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
+app = FastAPI(root_path="/test/")
 
 
 app.include_router(hello.router)
