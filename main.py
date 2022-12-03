@@ -25,7 +25,7 @@ app.include_router(hotels.router)
 
 @app.get('/')
 def home():
-    return "This is the entry point"
+    return "This is the entry point!"
 
 handler = Mangum(app=app)
 
