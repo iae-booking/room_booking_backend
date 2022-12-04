@@ -2,7 +2,7 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ work_flow_test ]
+    branches: [ main ]
 
 
 jobs:
@@ -13,7 +13,7 @@ jobs:
     steps:
       # Step 1
       - uses: actions/checkout@v2
-      # Step 1
+      # Step 2
       - name: Install AWS CLI
         uses: unfor19/install-aws-cli-action@v1
         with:
@@ -23,30 +23,34 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
       # Step 3
-      - name: Install Python Virtual ENV
-        run: docker build -t 550231130425.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/fastapi-aws-lambda:latest .
+      - name: Build docker image
+        run: docker build -t ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/fastapi-aws-lambda:latest .
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-      # Step 3
-      - name: Install Python Virtual ENV
-        run: aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin 550231130425.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      # Step 4
+      - name: Login to docker
+        run: aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-      # Step 3
-      - name: Install Python Virtual ENV
-        run: docker push 550231130425.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/fastapi-aws-lambda:latest
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      # Step 5
+      - name: Push image to AWS ECR
+        run: docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/fastapi-aws-lambda:latest
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-      # Step 3
-      - name: Install Python Virtual ENV
-        run: aws lambda update-function-code --function-name booking_backend --image-uri 550231130425.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/fastapi-aws-lambda:latest
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      # Step 6
+      - name: Update lambda function to latest image
+        run: aws lambda update-function-code --function-name booking_backend --image-uri ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/fastapi-aws-lambda:latest
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
