@@ -8,11 +8,21 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 client = TestClient(app)
 
+headers = {'Content-Type': 'multipart/form-data'}
 
 user = {
-        "username": "nary",
-        "password": "nary"
-    }
+    "email": "tttt@example.com",
+    "password": "string",
+    "name": "string",
+    "gender": 0,
+    "phone": "string",
+    "member_type": 0
+}
+
+user_login = {
+    "username": "tttt@example.com",
+    "password": "string"
+}
 
 
 def hash_password(password):
@@ -22,7 +32,7 @@ def hash_password(password):
 def test_register():
     res = client.post(
         "/auth/register/",
-        data=user
+        json=user
     )
 
     assert res.status_code == 200
@@ -33,6 +43,7 @@ def test_register():
 def test_login():
     res = client.post(
         "/auth/login/",
-        data=user
+        # headers=headers,
+        data=user_login
     )
     assert res.status_code == 200

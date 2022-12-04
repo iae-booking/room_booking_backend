@@ -1,4 +1,5 @@
 from pydantic import BaseModel, EmailStr
+# from pydantic.types import PaymentCardNumber
 from typing import Union
 
 class OrmBaseModel(BaseModel):
@@ -12,6 +13,7 @@ class User(OrmBaseModel):
     gender: int
     phone: Union[str, None] = None
     member_type: int
+    # credit_cards: PaymentCardNumber
 
 class Token(OrmBaseModel):
     access_token: str
