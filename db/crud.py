@@ -21,3 +21,24 @@ def create_hotel(db: Session, hotel_info: schemas.Hotel, member_id: int):
     db.commit()
     db.refresh(db_item)
     return db_item
+
+
+def ensure_user_owns_order(db: Session, member_id: int, order_id: int):
+    result = db.query(models.Order).filter(models.Order.id == order_id).first()
+    if result is None:
+        return False
+    else:
+        return result.member_id == member_id
+
+
+def ensure_no_duplicate_rating(db: Session, order_id: int):
+    result = db.query(models.Rating).filter(models.Rating.order_id == order_id).first()
+    return result is None
+
+
+def rate_order(db: Session, rate_info: schemas.Rate):
+    db_item = models.Rating(**rate_info.dict())
+    db.add(db_item)
+    db.commit()
+    db.refresh(db_item)
+    return db_item

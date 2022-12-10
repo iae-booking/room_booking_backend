@@ -28,3 +28,18 @@ class Member(Base):
     phone = Column(String)
     member_type = Column(Integer)
     # credit_cards = Column(String)
+
+
+class Order(Base):
+    __tablename__ = "order"
+    id = Column(Integer, Sequence('order_id_seq'), primary_key=True)
+    member_id = Column(Integer)
+
+
+class Rating(Base):
+    __tablename__ = "rating"
+    id = Column(Integer, Sequence('rating_id_seq'), primary_key=True)
+    evaluation = Column(Integer)
+    comments = Column(String)
+    image_path = Column(String)
+    order_id = Column(Integer, ForeignKey("order.id"))

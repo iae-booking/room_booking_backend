@@ -27,3 +27,14 @@ class Hotel(OrmBaseModel):
     city: Union[str, None] = None
     region: Union[str, None] = None
     road_and_number: Union[str, None] = None
+
+class Rate(OrmBaseModel):
+    evaluation: str
+    comments: Union[str, None] = None
+    image_path: Union[str, None] = None
+    order_id: int
+
+
+class RequestResult(OrmBaseModel):
+    status: str
+

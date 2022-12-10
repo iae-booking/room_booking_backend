@@ -31,9 +31,22 @@ def get_own_hotels(db: Session = Depends(get_db), member_id: int = Depends(get_m
     return hotels
 
 
-@router.post("/create", response_model=schemas.Hotel)
+@router.post("/create", response_model=schemas.RequestResult)
 def create_hotel(hotel_info: schemas.Hotel, db: Session = Depends(get_db), member_id: int = Depends(get_member_id)):
     if member_id is False:
         raise HTTPException(status_code=404, detail="User not found")
-    hotels = crud.create_hotel(db,hotel_info, member_id)
-    return hotels
+    crud.create_hotel(db,hotel_info, member_id)
+    return {'status': 'success'}
+
+
+@router.post("/rates", response_model=schemas.RequestResult)
+def rate_hotel(rate_info: schemas.Rate, db: Session = Depends(get_db), member_id: int = Depends(get_member_id)):
+    if member_id is False:
+        raise HTTPException(status_code=404, detail="User not found")
+    if crud.ensure_user_owns_order(db, member_id, rate_info.order_id) & \
+            crud.ensure_no_duplicate_rating(db, rate_info.order_id):
+        crud.rate_order(db, rate_info)
+        return {'status': 'success'}
+    else:
+        return {'status': 'fail'}
+

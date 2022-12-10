@@ -30,6 +30,7 @@ CREATE TABLE booking.member
     member_id SERIAL NOT NULL,
     phone CHARACTER VARYING(15),
     member_type SMALLINT NOT NULL DEFAULT 0,
+    image_path VARCHAR,
     credit_cards credit_cards,
     PRIMARY KEY (member_id),
     UNIQUE (email, member_id)
@@ -91,10 +92,8 @@ CREATE TABLE booking.rating(
     EVALUATION INT NOT NULL,
     COMMENTS VARCHAR,
 	IMAGE_PATH VARCHAR,
-    HOTEL_ID INT NOT NULL,
-	MEMBER_ID INT NOT NULL,
-    FOREIGN KEY(HOTEL_ID) REFERENCES booking.hotel(ID),
-    FOREIGN KEY(MEMBER_ID) REFERENCES booking.member(MEMBER_ID)
+    ORDER_ID INT NOT NULL,
+    FOREIGN KEY(ORDER_ID) REFERENCES booking.order(id)
 );
 
 CREATE TABLE booking.usedcoupon
@@ -122,7 +121,6 @@ CREATE TABLE booking.coupon(
 CREATE TABLE booking.order(
   id SERIAL PRIMARY KEY,
   fee int,
-  hotel_id int NOT NULL,
   member_id int NOT NULL,
   room_id int NOT NULL,
   amount int,
@@ -131,10 +129,17 @@ CREATE TABLE booking.order(
   start_date TIMESTAMP,
   note varchar,
   FOREIGN KEY(member_id) REFERENCES booking.member(member_id),
-  FOREIGN KEY(hotel_id) REFERENCES booking.hotel(id),
   FOREIGN KEY(room_id) REFERENCES booking.room(id)
 );
 
 INSERT INTO booking.member(
 	email, name, password, gender, phone, member_type)
 	VALUES ('ben@gmail.com', 'ben','fdsjal', 0, '246546', 0);
+
+INSERT INTO booking."room"(
+	room_name, HOTEL_ID)
+	VALUES ('dsfa',1);
+
+INSERT INTO booking."order"(
+	member_id, room_id)
+	VALUES (1,1);
