@@ -29,12 +29,30 @@ class Member(Base):
     member_type = Column(Integer)
     # credit_cards = Column(String)
 
+class Room(Base):
+    __tablename__ = "room"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    room_name = Column(String)
+    quantity = Column(Integer)
+    capacity = Column(Integer)
+    price = Column(Integer)
+    image_path = Column(String)
+    hotel_id = Column(Integer, ForeignKey("Hotel.id"))
 
 class Order(Base):
     __tablename__ = "order"
-    id = Column(Integer, Sequence('order_id_seq'), primary_key=True)
-    member_id = Column(Integer)
 
+    id = Column(Integer, Sequence('order_id_seq'), primary_key=True)
+    fee = Column(Integer)
+    amount = Column(Integer)
+    payment_method = Column(Integer)
+    end_data = Column(String)
+    start_data = Column(String)
+    note = Column(String)
+    hotel_id = Column(Integer, ForeignKey("Hotel.id"))
+    member_id = Column(Integer, ForeignKey("member.member_id"))
+    room_id = Column(Integer, ForeignKey("Room.id"))
 
 class Rating(Base):
     __tablename__ = "rating"
