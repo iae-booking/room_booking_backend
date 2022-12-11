@@ -27,6 +27,19 @@ class Hotel(OrmBaseModel):
     city: Union[str, None] = None
     region: Union[str, None] = None
     road_and_number: Union[str, None] = None
+        
+class Room(OrmBaseModel):
+    room_name: str
+    quantity: Union[str, None] = None
+    capacity: int
+    price: int
+
+class Order(OrmBaseModel):
+    fee: int
+    amount: int
+    payment_method: int
+    end_data: str
+    start_data: str
 
 class Rate(OrmBaseModel):
     evaluation: str
