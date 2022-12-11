@@ -22,6 +22,23 @@ def create_hotel(db: Session, hotel_info: schemas.Hotel, member_id: int):
     db.refresh(db_item)
     return db_item
 
+def add_room(db: Session, room_info: schemas.Room, hotel_id: int):
+    db_item = models.Room(**room_info.dict(), hotel_id=hotel_id, id=5)
+    db.add(db_item)
+    db.commit()
+    db.refresh(db_item)
+    return db_item
+
+def Search_rooms(db: Session, condition: dict):
+    res = db.query(models.Room).filter(((models.Hotel.city == condition[0]) or (models.Hotel.region == condition[0])) \
+                                       and models.Hotel.capacity == condition[1]).all()
+
+def order(db: Session, order_info: schemas.Order, hotel_id: int, room_id: int, member_id: int):
+    db_item = models.Order(**order_info.dict(), hotel_id=hotel_id, room_id=room_id, member_id=member_id, id=5)
+    db.add(db_item)
+    db.commit()
+    db.refresh(db_item)
+    return db_item
 
 def ensure_user_owns_order(db: Session, member_id: int, order_id: int):
     result = db.query(models.Order).filter(models.Order.id == order_id).first()
