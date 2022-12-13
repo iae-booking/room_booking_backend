@@ -13,6 +13,7 @@ psycopg2 = "*"
 mangum = "*"
 python-multipart = ">=0.0.5"
 fastapi-pagination = "*"
+sqlalchemy-utils = "*"
 
 [dev-packages]
 

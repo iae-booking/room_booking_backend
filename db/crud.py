@@ -4,10 +4,17 @@ from . import models, schemas
 
 
 def get_user(db: Session, email: str):
-    return db.query(models.Member).filter(models.Member.email == email).all()
+    return db.query(models.Member).filter(models.Member.email == email).first()
 
-def creat_account(db: Session, user_info: schemas.User):
+def creat_account(db: Session, user_info: schemas.Member):
     db_item = models.Member(**user_info.dict())
+    db.add(db_item)
+    db.commit()
+    db.refresh(db_item)
+    return db_item
+
+def db_add_credit_card(db: Session, credit_card: schemas.CreditCard, member_id: int):
+    db_item = models.CreditCard(**credit_card.dict(), member_id = member_id)
     db.add(db_item)
     db.commit()
     db.refresh(db_item)

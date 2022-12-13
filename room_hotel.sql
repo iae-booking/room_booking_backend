@@ -15,10 +15,21 @@ CREATE DOMAIN gender CHAR(1)
 /*
 https://zh.wikipedia.org/zh-tw/E.164
 */
-CREATE TYPE credit_cards AS (
+CREATE TYPE booking.credit_cards AS (
     safety_number  CHARACTER VARYING,
     card_id     CHARACTER VARYING,
     expire_date           DATE
+);
+
+CREATE TABLE booking.credit_cards
+(
+    safety_number  CHARACTER VARYING,
+    card_id     CHARACTER VARYING,
+    expire_date           DATE,
+    member_id   INT NOT NULL,
+    PRIMARY KEY (card_id),
+    UNIQUE (card_id),
+    FOREIGN KEY(MEMBER_ID) REFERENCES booking.member(MEMBER_ID)
 );
 
 CREATE TABLE booking.member
@@ -31,7 +42,6 @@ CREATE TABLE booking.member
     phone CHARACTER VARYING(15),
     member_type SMALLINT NOT NULL DEFAULT 0,
     image_path VARCHAR,
-    credit_cards credit_cards,
     PRIMARY KEY (member_id),
     UNIQUE (email, member_id)
 );
