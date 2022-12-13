@@ -29,7 +29,7 @@ class Hotel(OrmBaseModel):
     road_and_number: Union[str, None] = None
 
 class Rate(OrmBaseModel):
-    evaluation: str
+    evaluation: int
     comments: Union[str, None] = None
     image_path: Union[str, None] = None
     order_id: int

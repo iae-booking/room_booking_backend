@@ -17,6 +17,7 @@ class Hotel(Base):
     image_path = Column(String)
     member_id = Column(Integer, ForeignKey("member.member_id"))
 
+
 class Member(Base):
     __tablename__ = "member"
     # todo fill in the rest of this table
@@ -30,9 +31,16 @@ class Member(Base):
     # credit_cards = Column(String)
 
 
+class Room(Base):
+    __tablename__ = "room"
+    id = Column(Integer, Sequence('room_id_seq'), primary_key=True)
+    hotel_id = Column(Integer)
+
+
 class Order(Base):
     __tablename__ = "order"
     id = Column(Integer, Sequence('order_id_seq'), primary_key=True)
+    room_id = Column(Integer)
     member_id = Column(Integer)
 
 

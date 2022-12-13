@@ -9,9 +9,6 @@ models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(root_path="/test/")
 
-origins = [
-    "https://main.d2nlm8wd08s9mv.amplifyapp.com",
-]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=['*'],

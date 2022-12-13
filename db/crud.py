@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import select
 from . import models, schemas
 
 
@@ -25,15 +26,16 @@ def create_hotel(db: Session, hotel_info: schemas.Hotel, member_id: int):
 
 def ensure_user_owns_order(db: Session, member_id: int, order_id: int):
     result = db.query(models.Order).filter(models.Order.id == order_id).first()
-    if result is None:
-        return False
-    else:
-        return result.member_id == member_id
+    if (result is None) | (result.member_id != member_id):
+        raise
+    return
 
 
 def ensure_no_duplicate_rating(db: Session, order_id: int):
     result = db.query(models.Rating).filter(models.Rating.order_id == order_id).first()
-    return result is None
+    if result is not None:
+        raise
+    return
 
 
 def rate_order(db: Session, rate_info: schemas.Rate):
@@ -42,3 +44,27 @@ def rate_order(db: Session, rate_info: schemas.Rate):
     db.commit()
     db.refresh(db_item)
     return db_item
+
+
+def update_rate(db: Session, new_rate: schemas.Rate):
+    stmt = (
+        select(models.Rating)
+        .where(models.Rating.order_id == new_rate.order_id)
+    )
+    rate_item = db.scalars(stmt).one()
+    if (not rate_item) or (new_rate.evaluation > 5) or (new_rate.evaluation < 1):
+        raise
+    for key in new_rate.__dict__:
+        setattr(rate_item, key, eval("new_rate."+key))
+    db.commit()
+    db.refresh(rate_item)
+    return
+
+
+def get_rate_of_hotel(db: Session, hotel_id: int):
+    # todo refactor
+    result = db.query(models.Rating).filter(models.Rating.order_id.in_(db.query(models.Order.id)
+               .filter(models.Order.room_id.in_(db.query(models.Room.id)
+               .filter(models.Room.hotel_id == hotel_id)))))\
+               .all()
+    return result

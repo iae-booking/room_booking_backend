@@ -89,7 +89,7 @@ CREATE TABLE booking.room_service(   -- relation between room and facility
 -- Stars and Comments
 CREATE TABLE booking.rating(
     ID SERIAL PRIMARY KEY,
-    EVALUATION INT NOT NULL,
+    EVALUATION INT NOT NULL CHECK(EVALUATION >= 1 AND EVALUATION <= 5 ),
     COMMENTS VARCHAR,
 	IMAGE_PATH VARCHAR,
     ORDER_ID INT NOT NULL,
