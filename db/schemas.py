@@ -17,7 +17,6 @@ class Member(OrmBaseModel):
     name: str
     gender: int
     phone: Union[str, None] = None
-    member_type: int
 
 class Token(OrmBaseModel):
     access_token: str
@@ -31,6 +30,11 @@ class Hotel(OrmBaseModel):
     city: Union[str, None] = None
     region: Union[str, None] = None
     road_and_number: Union[str, None] = None
+    regulation: Union[str, None] = None
+    introduction: Union[str, None] = None
+    transportation: Union[str, None] = None
+    attraction: Union[str, None] = None
+
 
 class Rate(OrmBaseModel):
     evaluation: int
