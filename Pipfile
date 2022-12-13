@@ -12,6 +12,7 @@ sqlalchemy = "*"
 psycopg2 = "*"
 mangum = "*"
 python-multipart = ">=0.0.5"
+sqlalchemy-utils = "*"
 
 [dev-packages]
 

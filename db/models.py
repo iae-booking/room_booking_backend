@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Sequence
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Sequence, Date
 
 from .database import Base
 
@@ -27,7 +27,15 @@ class Member(Base):
     gender = Column(Integer)
     phone = Column(String)
     member_type = Column(Integer)
-    # credit_cards = Column(String)
+
+
+class CreditCard(Base):
+    __tablename__ = "credit_cards"
+
+    safety_number = Column(String)
+    card_id = Column(String, primary_key=True)
+    expire_date = Column(Date)
+    member_id = Column(Integer)
 
 
 class Order(Base):

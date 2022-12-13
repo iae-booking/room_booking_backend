@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from db import crud, schemas
 from db.database import SessionLocal
-from db.schemas import User, Token, TokenData
+from db.schemas import Member, Token, TokenData, CreditCard
 from auth_info import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 
 router = APIRouter(
@@ -51,12 +51,6 @@ def auth_user(db, email: str, password: str):
     return user
 
 
-# def get_user(db, username: str):
-#     if username in db:
-#         user_dict = db[username]
-#         return User(**user_dict)
-
-
 def verify_password(passward, hashed_password):
     return pwd_context.verify(passward, hashed_password)
 
@@ -72,7 +66,7 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
     return encoded_jwt
 
 
-async def get_current_user(db, token: str = Depends(oauth2_scheme)):
+async def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -97,7 +91,7 @@ def hash_password(password):
 
 
 @router.post("/register")
-def register(user_info: schemas.User, db: Session = Depends(get_db)):
+def register(user_info: Member, db: Session = Depends(get_db)):
     # check if username exist
     result = crud.get_user(db, user_info.dict()["email"])
     if(len(result) != 0):
@@ -126,6 +120,17 @@ def login(db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = 
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
+@router.post("/credit_card")
+def add_credit_card(
+        credit_card: CreditCard, 
+        current_user: Member = Depends(get_current_user), 
+        db: Session = Depends(get_db)
+    ):
+    res = crud.db_add_credit_card(db, credit_card, current_user.member_id)
+    if res:
+        return 200
+    return "create error"
+
 
 @router.get('/info')
 def get_hashed_password(password: str):
@@ -134,5 +139,5 @@ def get_hashed_password(password: str):
 
 
 @router.get('/user')
-def read_user(current_user: User = Depends(get_current_user)):
+def read_user(current_user: Member = Depends(get_current_user)):
     return current_user

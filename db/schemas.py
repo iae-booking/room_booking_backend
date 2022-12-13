@@ -1,19 +1,23 @@
 from pydantic import BaseModel, EmailStr
-# from pydantic.types import PaymentCardNumber
 from typing import Union
+from datetime import date
 
 class OrmBaseModel(BaseModel):
     class Config:
         orm_mode = True
 
-class User(OrmBaseModel):
+class CreditCard(OrmBaseModel):
+    safety_number: str
+    card_id: str
+    expire_date: date
+
+class Member(OrmBaseModel):
     email: EmailStr
     password: str
     name: str
     gender: int
     phone: Union[str, None] = None
     member_type: int
-    # credit_cards: PaymentCardNumber
 
 class Token(OrmBaseModel):
     access_token: str
