@@ -23,18 +23,18 @@ def create_hotel(db: Session, hotel_info: schemas.Hotel, member_id: int):
     return db_item
 
 def add_room(db: Session, room_info: schemas.Room, hotel_id: int):
-    db_item = models.Room(**room_info.dict(), hotel_id=hotel_id, id=5)
+    db_item = models.Room(**room_info.dict(), hotel_id=hotel_id)
     db.add(db_item)
     db.commit()
     db.refresh(db_item)
     return db_item
 
-def Search_rooms(db: Session, condition: dict):
+def search_rooms(db: Session, condition: dict):
     res = db.query(models.Room).filter(((models.Hotel.city == condition[0]) or (models.Hotel.region == condition[0])) \
                                        and models.Hotel.capacity == condition[1]).all()
 
-def order(db: Session, order_info: schemas.Order, hotel_id: int, room_id: int, member_id: int):
-    db_item = models.Order(**order_info.dict(), hotel_id=hotel_id, room_id=room_id, member_id=member_id, id=5)
+def place_order(db: Session, order_info: schemas.Order, hotel_id: int, room_id: int, member_id: int):
+    db_item = models.Order(**order_info.dict(), room_id=room_id, member_id=member_id)
     db.add(db_item)
     db.commit()
     db.refresh(db_item)

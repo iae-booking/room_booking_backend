@@ -38,23 +38,23 @@ def create_hotel(hotel_info: schemas.Hotel, db: Session = Depends(get_db), membe
     crud.create_hotel(db,hotel_info, member_id)
     return {'status': 'success'}
 
-@router.post("/create", response_model=schemas.Room)
-def add_room(room_info: schemas.Room, db: Session = Depends(get_db), member_id: int = Depends(get_member_id), hotel_id: int = 1):
+@router.post("/add-room", response_model=schemas.Room)
+def add_room(*, room_info: schemas.Room, db: Session = Depends(get_db), member_id: int = Depends(get_member_id), hotel_id: int):
     if member_id is False:
         raise HTTPException(status_code=404, detail="User not found")
-    rooms = crud.add_room(db,room_info, hotel_id)
-    return rooms
+    crud.add_room(db,room_info, hotel_id)
+    return {'Success': 'added successfully'}
 
 @router.post("/order", response_model=schemas.Order)
-def order(order_info: schemas.Order, db: Session = Depends(get_db), member_id: int = Depends(get_member_id), hotel_id: int = 1, room_id: int = 1):
+def place_order(*, order_info: schemas.Order, db: Session = Depends(get_db), member_id: int = Depends(get_member_id), hotel_id: int, room_id: int):
     if member_id is False:
         raise HTTPException(status_code=404, detail="User not found")
-    orders = crud.order(db,order_info, hotel_id, room_id, member_id)
-    return orders
+    crud.place_order(db,order_info, hotel_id, room_id, member_id)
+    return {'Success': 'Order established'}
 
 @router.get("/search", response_model=List[schemas.Hotel])
-def Search_hotels(db: Session = Depends(get_db)):
-    rooms = crud.create_hotel(db)
+def search_hotels(db: Session = Depends(get_db)):
+    rooms = crud.search_rooms(db)
     return rooms
 
 @router.post("/rates", response_model=schemas.RequestResult)

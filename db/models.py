@@ -50,7 +50,6 @@ class Order(Base):
     end_data = Column(String)
     start_data = Column(String)
     note = Column(String)
-    hotel_id = Column(Integer, ForeignKey("Hotel.id"))
     member_id = Column(Integer, ForeignKey("member.member_id"))
     room_id = Column(Integer, ForeignKey("Room.id"))
 
