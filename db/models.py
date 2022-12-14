@@ -30,7 +30,7 @@ class Member(Base):
     name = Column(String)
     gender = Column(Integer)
     phone = Column(String)
-    member_type = Column(Integer)
+    member_type = Column(Integer,default=0)
 
 
 class CreditCard(Base):

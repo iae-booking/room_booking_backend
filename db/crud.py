@@ -20,8 +20,10 @@ def db_add_credit_card(db: Session, credit_card: schemas.CreditCard, member_id: 
     db.refresh(db_item)
     return db_item
 
+
 def get_own_hotels(db: Session, member_id: int):
     return db.query(models.Hotel).filter(models.Hotel.member_id == member_id).all()
+
 
 def create_hotel(db: Session, hotel_info: schemas.Hotel, member_id: int):
     db_item = models.Hotel(**hotel_info.dict(), member_id=member_id)

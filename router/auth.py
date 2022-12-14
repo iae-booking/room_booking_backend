@@ -94,7 +94,7 @@ def hash_password(password):
 def register(user_info: Member, db: Session = Depends(get_db)):
     # check if username exist
     result = crud.get_user(db, user_info.dict()["email"])
-    if(len(result) != 0):
+    if result is not None:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="email already exist",
