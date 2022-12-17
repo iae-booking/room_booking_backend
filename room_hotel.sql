@@ -41,7 +41,7 @@ CREATE TABLE booking.member
     member_id SERIAL NOT NULL,
     phone CHARACTER VARYING(15),
     member_type SMALLINT NOT NULL DEFAULT 0,
-    image_path VARCHAR,
+    image BYTEA,
     PRIMARY KEY (member_id),
     UNIQUE (email, member_id)
 );
@@ -57,7 +57,7 @@ CREATE TABLE booking.hotel(
     ROAD_AND_NUMBER VARCHAR,
     TRANSPORTATION VARCHAR,
     CERTIFICATE_NUMBER VARCHAR,
-    IMAGE_PATH VARCHAR,
+    images BYTEA[],
 	MEMBER_ID INT NOT NULL,
     FOREIGN KEY(MEMBER_ID) REFERENCES booking.member(MEMBER_ID)
 );
@@ -69,7 +69,7 @@ CREATE TABLE booking.room(
     QUANTITY INT,
     CAPACITY INT,
     PRICE INT,
-    IMAGE_PATH VARCHAR,
+    images BYTEA[],
 	HOTEL_ID INT NOT NULL,
     FOREIGN KEY(HOTEL_ID) REFERENCES booking.hotel(ID)
 );
@@ -104,7 +104,7 @@ CREATE TABLE booking.rating(
     ID SERIAL PRIMARY KEY,
     EVALUATION INT NOT NULL CHECK(EVALUATION >= 1 AND EVALUATION <= 5 ),
     COMMENTS VARCHAR,
-	IMAGE_PATH VARCHAR,
+	images BYTEA[],
     ORDER_ID INT NOT NULL,
     FOREIGN KEY(ORDER_ID) REFERENCES booking.order(id)
 );
