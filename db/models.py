@@ -1,5 +1,5 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Sequence, Date
-
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Sequence, Date, LargeBinary
+from sqlalchemy.dialects.postgresql import ARRAY
 from .database import Base
 
 
@@ -17,19 +17,19 @@ class Hotel(Base):
     road_and_number = Column(String)
     transportation = Column(String)
     certificate_number = Column(String)
-    image_path = Column(String)
+    images= Column(ARRAY(LargeBinary))
     member_id = Column(Integer, ForeignKey("member.member_id"))
 
 
 class Member(Base):
     __tablename__ = "member"
-    # todo fill in the rest of this table
     email = Column(String)
     member_id = Column(Integer, primary_key=True)
     password = Column(String)
     name = Column(String)
     gender = Column(Integer)
     phone = Column(String)
+    image = Column(LargeBinary)
     member_type = Column(Integer,default=0)
 
 
@@ -60,5 +60,5 @@ class Rating(Base):
     id = Column(Integer, Sequence('rating_id_seq'), primary_key=True)
     evaluation = Column(Integer)
     comments = Column(String)
-    image_path = Column(String)
+    images= Column(ARRAY(LargeBinary))
     order_id = Column(Integer, ForeignKey("order.id"))

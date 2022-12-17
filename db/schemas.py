@@ -1,10 +1,12 @@
 from pydantic import BaseModel, EmailStr
 from typing import Union, List
 from datetime import date
+from typing import List
 
 class OrmBaseModel(BaseModel):
     class Config:
         orm_mode = True
+
 
 class CreditCard(OrmBaseModel):
     safety_number: str
@@ -17,6 +19,7 @@ class Member(OrmBaseModel):
     name: str
     gender: int
     phone: Union[str, None] = None
+    image: Union[str, bytes, None] = None
 
 class MemberInfo(OrmBaseModel):
     email: EmailStr
@@ -43,12 +46,12 @@ class Hotel(OrmBaseModel):
     introduction: Union[str, None] = None
     transportation: Union[str, None] = None
     attraction: Union[str, None] = None
-
+    images: Union[str, List[bytes], None] = None
 
 class Rate(OrmBaseModel):
     evaluation: int
     comments: Union[str, None] = None
-    image_path: Union[str, None] = None
+    images: Union[str, List[bytes], None] = None
     order_id: int
 
 
