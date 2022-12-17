@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import select
+from sqlalchemy import select, update
 from . import models, schemas
 
 
@@ -12,6 +12,23 @@ def creat_account(db: Session, user_info: schemas.Member):
     db.commit()
     db.refresh(db_item)
     return db_item
+
+def update_member_info(db: Session, user_info: schemas.MemberInfo):
+    db_item = db.query(models.Member).filter(models.Member.email == user_info.email).first()
+    if not db_item:
+        raise ValueError("data not found")
+    stmt = (
+        update(models.Member)
+        .where(models.Member.email.in_([user_info.email]))
+        .values(**user_info.dict())
+    )
+    db.execute(stmt)
+    db.commit()
+    db.refresh(db_item)
+    return db_item
+
+def get_credit_card(db: Session, member_id: int):
+    return db.query(models.CreditCard).filter(models.CreditCard.member_id == member_id).all()
 
 def db_add_credit_card(db: Session, credit_card: schemas.CreditCard, member_id: int):
     db_item = models.CreditCard(**credit_card.dict(), member_id = member_id)

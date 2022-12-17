@@ -41,10 +41,9 @@ def get_db():
 
 
 def auth_user(db, email: str, password: str):
-    users = crud.get_user(db, email)
-    if len(users) < 1:
+    user = crud.get_user(db, email)
+    if not user:
         return False
-    user = users[0]
     print(user.password)
     if not verify_password(password, user.password):
         return False
@@ -119,17 +118,6 @@ def login(db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = 
         data={"sub": user.email}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
-
-@router.post("/credit_card")
-def add_credit_card(
-        credit_card: CreditCard, 
-        current_user: Member = Depends(get_current_user), 
-        db: Session = Depends(get_db)
-    ):
-    res = crud.db_add_credit_card(db, credit_card, current_user.member_id)
-    if res:
-        return 200
-    return "create error"
 
 
 @router.get('/info')
