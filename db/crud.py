@@ -27,12 +27,29 @@ def update_member_info(db: Session, user_info: schemas.MemberInfo):
     db.refresh(db_item)
     return db_item
 
-def get_credit_card(db: Session, member_id: int):
+def get_credit_cards_by_member(db: Session, member_id: int):
     return db.query(models.CreditCard).filter(models.CreditCard.member_id == member_id).all()
+
+def get_credit_card(db: Session, card_id: str):
+    return db.query(models.CreditCard).filter(models.CreditCard.card_id == card_id).first()
 
 def db_add_credit_card(db: Session, credit_card: schemas.CreditCard, member_id: int):
     db_item = models.CreditCard(**credit_card.dict(), member_id = member_id)
     db.add(db_item)
+    db.commit()
+    db.refresh(db_item)
+    return db_item
+
+def update_credit_card(db: Session, credit_card: schemas.CreditCard):
+    db_item = db.query(models.CreditCard).filter(models.CreditCard.card_id == credit_card.card_id).first()
+    if not db_item:
+        raise ValueError("data not found")
+    stmt = (
+        update(models.CreditCard)
+        .where(models.CreditCard.card_id.in_([credit_card.card_id]))
+        .values(**credit_card.dict())
+    )
+    db.execute(stmt)
     db.commit()
     db.refresh(db_item)
     return db_item
