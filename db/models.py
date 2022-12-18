@@ -32,12 +32,15 @@ class Member(Base):
 class Room(Base):
     __tablename__ = "room"
 
-    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    id = Column(Integer, Sequence('room_id_seq'), primary_key=True)
     room_name = Column(String)
     quantity = Column(Integer)
     capacity = Column(Integer)
-    price = Column(Integer)
-    image_path = Column(String)
+    bed_type= Column(String)
+    introduction= Column(String)
+    installation= Column(String)
+    Original_price= Column(Integer)
+    IAE_price= Column(Integer)
     hotel_id = Column(Integer, ForeignKey("Hotel.id"))
 
 class Order(Base):
