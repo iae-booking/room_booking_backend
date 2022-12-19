@@ -49,21 +49,23 @@ class Hotel(OrmBaseModel):
     images: Union[str, List[bytes], None] = None
 
 class Room(OrmBaseModel):
-    room_name: str
-    quantity: int
-    capacity: int
+    room_name: Union[str, None]
+    quantity: Union[int, None]
+    capacity: Union[int, None]
     bed_type: Union[str, None] = None
     introduction: Union[str, None] = None
     installation: Union[str, None] = None
-    Original_price: int
-    IAE_price:int
+    original_price: Union[int, None]
+    iae_price: Union[int, None]
+    hotel_id: Union[int, None]
 
 class Order(OrmBaseModel):
-    fee: int
-    amount: int
-    payment_method: int
-    end_data: str
-    start_data: str
+    fee: Union[int, None]
+    amount: Union[int, None]
+    payment_method: Union[int, None]
+    end_date: Union[str, None]
+    start_date: Union[str, None]
+    room_id: Union[int, None]
 
 class Rate(OrmBaseModel):
     evaluation: int

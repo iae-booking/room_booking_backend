@@ -56,10 +56,10 @@ CREATE TABLE booking.room(
     QUANTITY INT,
     CAPACITY INT,
     BED_TYPE VARCHAR,
-    introduction VARCHAR,
-    installation VARCHAR,
-    Original_price INT,
-    IAE_price INT,
+    INTRODUCTION VARCHAR,
+    INSTALLATION VARCHAR,
+    ORIGINAL_PRICE INT,
+    IAE_PRICE INT,
 	HOTEL_ID INT NOT NULL,
     FOREIGN KEY(HOTEL_ID) REFERENCES booking.hotel(ID)
 );

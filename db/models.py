@@ -39,9 +39,10 @@ class Room(Base):
     bed_type= Column(String)
     introduction= Column(String)
     installation= Column(String)
-    Original_price= Column(Integer)
-    IAE_price= Column(Integer)
-    hotel_id = Column(Integer, ForeignKey("Hotel.id"))
+    original_price= Column(Integer)
+    iae_price= Column(Integer)
+    hotel_id = Column(Integer)
+    hotel_id = Column(Integer, ForeignKey("hotel.id"))
 
 class Order(Base):
     __tablename__ = "order"
@@ -50,11 +51,13 @@ class Order(Base):
     fee = Column(Integer)
     amount = Column(Integer)
     payment_method = Column(Integer)
-    end_data = Column(String)
-    start_data = Column(String)
+    end_date = Column(String)
+    start_date = Column(String)
     note = Column(String)
+    member_id = Column(Integer)
+    room_id = Column(Integer)
     member_id = Column(Integer, ForeignKey("member.member_id"))
-    room_id = Column(Integer, ForeignKey("Room.id"))
+    room_id = Column(Integer, ForeignKey("room.id"))
 
 class Rating(Base):
     __tablename__ = "rating"
