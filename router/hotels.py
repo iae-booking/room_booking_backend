@@ -52,11 +52,11 @@ def add_room(*,room_info: schemas.Room, db: Session = Depends(get_db), member_id
 def place_order(*,order_info: schemas.Order, db: Session = Depends(get_db), member_id: int = Depends(get_member_id)):
     if member_id is False:
         raise HTTPException(status_code=404, detail="User not found")
-    #try:
-    crud.place_order(db,order_info, member_id)
-    return {'status': 'success'}
-    #except:
-    #    return {'status': 'fail'}
+    try:
+        crud.place_order(db,order_info, member_id)
+        return {'status': 'success'}
+    except:
+        return {'status': 'fail'}
 
 @router.get("/search", response_model=List[schemas.Hotel])
 def search_hotels(db: Session = Depends(get_db)):
