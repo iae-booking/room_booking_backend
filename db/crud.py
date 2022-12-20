@@ -22,6 +22,10 @@ def create_hotel(db: Session, hotel_info: schemas.Hotel, member_id: int):
     db.refresh(db_item)
     return db_item
 
+def check_hotel_id(db: Session, member_id: int):
+    return db.query(models.Hotel.id).filter(models.Hotel.member_id == member_id).all()
+
+
 def add_room(db: Session, room_info: schemas.Room):
     db_item = models.Room(**room_info.dict())
     db.add(db_item)
