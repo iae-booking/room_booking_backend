@@ -42,6 +42,11 @@ def create_hotel(hotel_info: schemas.Hotel, db: Session = Depends(get_db), membe
 def add_room(*,room_info: schemas.Room, db: Session = Depends(get_db), member_id: int = Depends(get_member_id)):
     if member_id is False:
         raise HTTPException(status_code=404, detail="User not found")
+    hotel_id_list = []
+    for id_dict in crud.check_hotel_id(db, member_id):
+        hotel_id_list.append(id_dict['id'])
+    if room_info.hotel_id not in hotel_id_list:
+        raise HTTPException(status_code=404, detail="Hotel not found")
     try:
         crud.add_room(db,room_info)
         return {'status': 'success'}
