@@ -7,7 +7,7 @@ from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 
 from db import crud, schemas
-from db.database import SessionLocal
+from db.database import get_db
 from db.schemas import Member, Token, TokenData, CreditCard, MemberCreditCard, MemberInfo
 from auth_info import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 
@@ -20,12 +20,6 @@ router = APIRouter(
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 async def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):

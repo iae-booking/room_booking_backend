@@ -19,7 +19,7 @@ class Member(OrmBaseModel):
     name: str
     gender: int
     phone: Union[str, None] = None
-    image_path: Union[str, bytes, None] = None
+    image: Union[str, bytes, None] = None
 
 class MemberInfo(OrmBaseModel):
     email: EmailStr
@@ -50,6 +50,33 @@ class Hotel(OrmBaseModel):
 
 class HotelForGetUpdate(Hotel):
     id: Union[int, None] = None
+
+
+class CreateRoom(OrmBaseModel):
+    room_name: str
+    quantity: Union[int, None] = None
+    bed_type: Union[str, None]
+    capacity: int
+    introduction: Union[str, None]
+    installation: Union[str, None]
+    original_price: int
+    price: int
+    hotel_id : int
+    images: Union[str, List[bytes], None] = None
+
+
+class GetAndUpdateRoom(OrmBaseModel):
+    id: int
+    room_name: str
+    quantity: Union[int, None] = None
+    bed_type: Union[str, None]
+    capacity: int
+    introduction: Union[str, None]
+    installation: Union[str, None]
+    original_price: int
+    price: int
+    images: Union[str, List[bytes], None] = None
+
 
 class Rate(OrmBaseModel):
     evaluation: int

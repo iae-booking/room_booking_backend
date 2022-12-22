@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from db import crud, schemas
-from db.database import SessionLocal
+from db.database import get_db
 from typing import List
 from fastapi_pagination import Page, paginate, Params
 
@@ -17,13 +17,6 @@ def get_member_id():
     # todo complete this
     return 1
 
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 @router.get("/own", response_model=List[schemas.HotelForGetUpdate])

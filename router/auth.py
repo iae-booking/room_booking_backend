@@ -7,7 +7,7 @@ from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 
 from db import crud, schemas
-from db.database import SessionLocal
+from db.database import get_db
 from db.schemas import Member, Token, TokenData, CreditCard
 from auth_info import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 
@@ -30,14 +30,6 @@ fake_user_db = {
         "password": "$2b$12$ltlzMGdm63UrNfp76bbk8.Fuj.d8ajw/4Z3P9uIahrromZHqFpWb.",
     },
 }
-
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 def auth_user(db, email: str, password: str):
