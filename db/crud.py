@@ -40,7 +40,8 @@ def db_add_credit_card(db: Session, credit_card: schemas.CreditCard, member_id: 
     db.refresh(db_item)
     return db_item
 
-def add_room(db: Session, room_info: schemas.Room):
+
+def add_room(db: Session, room_info: schemas.CreateRoom):
     db_item = models.Room(**room_info.dict())
     db.add(db_item)
     db.commit()
@@ -72,6 +73,16 @@ def create_hotel(db: Session, hotel_info: schemas.Hotel, member_id: int):
     db.commit()
     db.refresh(db_item)
     return db_item
+
+
+def ensure_user_owns_room(db: Session, member_id: int, room_id: int):
+    print(room_id)
+    room = db.query(models.Room).filter(models.Room.id == room_id).first()
+    result = db.query(models.Hotel).filter(models.Hotel.id == room.hotel_id).first()
+    if (result is None) | (result.member_id != member_id):
+        raise
+    return
+
 
 def ensure_user_owns_hotel(db: Session, member_id: int, hotel_id: int):
     result = db.query(models.Hotel).filter(models.Hotel.id == hotel_id).first()
@@ -124,3 +135,23 @@ def get_rate_of_hotel(db: Session, hotel_id: int):
                .filter(models.Room.hotel_id == hotel_id)))))\
                .all()
     return result
+
+
+def get_rooms_of_hotel(db: Session, hotel_id: int):
+    result = db.query(models.Room).filter(models.Room.hotel_id == hotel_id).all()
+    return result
+
+
+def update_room(db: Session, room_info: schemas.GetAndUpdateRoom):
+    db_item = db.query(models.Room).filter(models.Room.id == room_info.id).first()
+    if not db_item:
+        raise ValueError("room not found")
+    stmt = (
+        update(models.Room)
+        .where(models.Room.id.in_([room_info.id]))
+        .values(**room_info.dict())
+    )
+    db.execute(stmt)
+    db.commit()
+    db.refresh(db_item)
+    return
