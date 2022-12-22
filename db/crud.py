@@ -40,6 +40,13 @@ def db_add_credit_card(db: Session, credit_card: schemas.CreditCard, member_id: 
     db.refresh(db_item)
     return db_item
 
+def add_room(db: Session, room_info: schemas.Room):
+    db_item = models.Room(**room_info.dict())
+    db.add(db_item)
+    db.commit()
+    db.refresh(db_item)
+    return db_item
+
 def update_credit_card(db: Session, credit_card: schemas.CreditCard):
     db_item = db.query(models.CreditCard).filter(models.CreditCard.card_id == credit_card.card_id).first()
     if not db_item:
@@ -65,6 +72,12 @@ def create_hotel(db: Session, hotel_info: schemas.Hotel, member_id: int):
     db.commit()
     db.refresh(db_item)
     return db_item
+
+def ensure_user_owns_hotel(db: Session, member_id: int, hotel_id: int):
+    result = db.query(models.Hotel).filter(models.Hotel.id == hotel_id).first()
+    if (result is None) | (result.member_id != member_id):
+        raise
+    return
 
 
 def ensure_user_owns_order(db: Session, member_id: int, order_id: int):

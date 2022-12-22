@@ -29,7 +29,7 @@ class Member(Base):
     name = Column(String)
     gender = Column(Integer)
     phone = Column(String)
-    image_path = Column(LargeBinary)
+    image = Column(LargeBinary)
     member_type = Column(Integer,default=0)
 
 
@@ -45,8 +45,16 @@ class CreditCard(Base):
 class Room(Base):
     __tablename__ = "room"
     id = Column(Integer, Sequence('room_id_seq'), primary_key=True)
-    hotel_id = Column(Integer)
-
+    room_name = Column(String)
+    quantity = Column(Integer)
+    capacity = Column(Integer)
+    bed_type= Column(String)
+    introduction= Column(String)
+    installation= Column(String)
+    original_price= Column(Integer)
+    price= Column(Integer)
+    images= Column(ARRAY(LargeBinary))
+    hotel_id = Column(Integer, ForeignKey("hotel.id"))
 
 class Order(Base):
     __tablename__ = "order"
