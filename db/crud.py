@@ -59,6 +59,33 @@ def get_own_hotels(db: Session, member_id: int):
     return db.query(models.Hotel).filter(models.Hotel.member_id == member_id).all()
 
 
+def check_member_owes_hotel(db: Session, member_id: int, hotel_id: int):
+    return db.query(models.Hotel).filter(models.Hotel.member_id == member_id, models.Hotel.id == hotel_id).first
+
+
+def update_hotel(db: Session, hotel_info: schemas.Hotel):
+    db_item = db.query(models.Hotel).filter(models.Hotel.id == hotel_info.id).first()
+    if not db_item:
+        raise ValueError("data not found")
+    stmt = (
+        update(models.Hotel)
+        .where(models.Hotel.id.in_([hotel_info.id]))
+        .values(**hotel_info.dict())
+    )
+    db.execute(stmt)
+    db.commit()
+    db.refresh(db_item)
+    return db_item
+
+
+def delete_hotel(db: Session, hotel_id: int):
+    db_item = db.query(models.Hotel).filter(models.Hotel.id == hotel_id).first()
+    db.delete(db_item)
+    db.commit()
+    return db_item
+
+
+
 def create_hotel(db: Session, hotel_info: schemas.Hotel, member_id: int):
     db_item = models.Hotel(**hotel_info.dict(), member_id=member_id)
     db.add(db_item)
