@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import select, update
 from . import models, schemas
+import datetime
 
 
 def get_user(db: Session, email: str):
@@ -182,3 +183,24 @@ def update_room(db: Session, room_info: schemas.GetAndUpdateRoom):
     db.commit()
     db.refresh(db_item)
     return
+
+def search_rooms(db: Session, place: str, number_of_people: int, start_date: datetime.date, end_date: datetime.date):
+    dates = []
+    for i in range(abs(start_date-end_date).days):
+        dates.append(start_date + datetime.timedelta(days=1))
+    result = db.query(models.Room).filter(((models.Hotel.city == place) or (models.Hotel.region == place)) \
+                                       and (models.Room.capacity == number_of_people) and check_clear_dates(dates)).all()
+    return result
+
+def check_clear_dates(dates: list):
+    for date in dates:
+        if date in models.Booking_date.date:
+            return False
+    return True
+
+def place_order(db: Session, order_info: schemas.Order, member_id: int):
+    db_item = models.Order(**order_info.dict(), member_id=member_id)
+    db.add(db_item)
+    db.commit()
+    db.refresh(db_item)
+    return db_item

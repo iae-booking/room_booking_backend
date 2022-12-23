@@ -88,3 +88,13 @@ class Rate(OrmBaseModel):
 class RequestResult(OrmBaseModel):
     status: str
 
+
+class Search(OrmBaseModel):
+    place: str
+    number_of_people: int
+    start_date: date
+    end_date: date
+class Order(OrmBaseModel):
+    room_id: int
+    start_date: date
+    end_date: date

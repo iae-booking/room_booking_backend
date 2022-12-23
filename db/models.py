@@ -59,8 +59,10 @@ class Room(Base):
 class Order(Base):
     __tablename__ = "order"
     id = Column(Integer, Sequence('order_id_seq'), primary_key=True)
-    room_id = Column(Integer)
-    member_id = Column(Integer)
+    start_date = Column(Date)
+    end_date = Column(Date)
+    room_id = Column(Integer, ForeignKey("room.id"))
+    member_id = Column(Integer, ForeignKey("member.member_id"))
 
 
 class Rating(Base):
@@ -70,3 +72,8 @@ class Rating(Base):
     comments = Column(String)
     images= Column(ARRAY(LargeBinary))
     order_id = Column(Integer, ForeignKey("order.id"))
+
+class Booking_date(Base):
+    __tablename__ = "booking_date"
+    room_id = Column(Integer, ForeignKey("room.id"), primary_key=True)
+    date = Column(Date, primary_key=True)
