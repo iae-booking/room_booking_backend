@@ -46,7 +46,7 @@ class Hotel(OrmBaseModel):
     introduction: Union[str, None] = None
     transportation: Union[str, None] = None
     attraction: Union[str, None] = None
-    image_path: Union[List[bytes], None] = None
+    images: Union[List[bytes], None] = None
 
 class HotelForGetUpdate(Hotel):
     id: Union[int, None] = None
