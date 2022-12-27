@@ -137,16 +137,22 @@ CREATE TABLE booking.coupon(
 
 CREATE TABLE booking.order(
   id SERIAL PRIMARY KEY,
-  fee int,
   member_id int NOT NULL,
-  room_id int NOT NULL,
-  amount int,
   payment_method SMALLINT,
   end_date TIMESTAMP,
   start_date TIMESTAMP,
   note varchar,
-  FOREIGN KEY(member_id) REFERENCES booking.member(member_id),
+  FOREIGN KEY(member_id) REFERENCES booking.member(member_id)
+);
+
+CREATE TABLE booking.room_order(
+  id SERIAL PRIMARY KEY,
+  fee int,
+  room_id int NOT NULL,
+  order_id int NOT NULL,
+  amount int,,
   FOREIGN KEY(room_id) REFERENCES booking.room(id)
+  FOREIGN KEY(order_id) REFERENCES booking.order(id)
 );
 
 INSERT INTO booking.member(
