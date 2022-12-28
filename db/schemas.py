@@ -19,7 +19,7 @@ class Member(OrmBaseModel):
     name: str
     gender: int
     phone: Union[str, None] = None
-    image: Union[str, bytes, None] = None
+    images: Union[str, bytes, None] = None
 
 class MemberInfo(OrmBaseModel):
     email: EmailStr

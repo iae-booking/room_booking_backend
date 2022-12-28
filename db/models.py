@@ -29,7 +29,7 @@ class Member(Base):
     name = Column(String)
     gender = Column(Integer)
     phone = Column(String)
-    image = Column(LargeBinary)
+    images = Column(LargeBinary)
     member_type = Column(Integer,default=0)
 
 

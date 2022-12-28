@@ -41,7 +41,7 @@ CREATE TABLE booking.member
     member_id SERIAL NOT NULL,
     phone CHARACTER VARYING(15),
     member_type SMALLINT NOT NULL DEFAULT 0,
-    image BYTEA,
+    images BYTEA,
     PRIMARY KEY (member_id),
     UNIQUE (email, member_id)
 );

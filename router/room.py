@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from db import crud, schemas
 from db.database import get_db
 from fastapi_pagination import Page, paginate, Params
+from router.auth import get_current_user_id
 
 router = APIRouter(
     prefix="/room",
@@ -11,14 +12,8 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
-
-def get_member_id():
-    # todo complete this
-    return 1
-
-
 @router.post("/", response_model=schemas.RequestResult)
-def add_room(room_info: schemas.CreateRoom, db: Session = Depends(get_db), member_id: int = Depends(get_member_id)):
+def add_room(room_info: schemas.CreateRoom, db: Session = Depends(get_db), member_id: int = Depends(get_current_user_id)):
     if member_id is False:
         raise HTTPException(status_code=404, detail="User not found")
     try:
@@ -30,7 +25,7 @@ def add_room(room_info: schemas.CreateRoom, db: Session = Depends(get_db), membe
 
 
 @router.put("/", response_model=schemas.RequestResult)
-def update_room(room_info: schemas.GetAndUpdateRoom, db: Session = Depends(get_db), member_id: int = Depends(get_member_id)):
+def update_room(room_info: schemas.GetAndUpdateRoom, db: Session = Depends(get_db), member_id: int = Depends(get_current_user_id)):
     if member_id is False:
         raise HTTPException(status_code=404, detail="User not found")
     try:
