@@ -62,7 +62,6 @@ class CreateRoom(OrmBaseModel):
     original_price: int
     price: int
     hotel_id : int
-    images: Union[str, List[bytes], None] = None
 
 
 class GetAndUpdateRoom(OrmBaseModel):
@@ -75,7 +74,6 @@ class GetAndUpdateRoom(OrmBaseModel):
     installation: Union[str, None]
     original_price: int
     price: int
-    images: Union[str, List[bytes], None] = None
 
 
 class Rate(OrmBaseModel):

@@ -53,7 +53,6 @@ class Room(Base):
     installation= Column(String)
     original_price= Column(Integer)
     price= Column(Integer)
-    images= Column(ARRAY(LargeBinary))
     hotel_id = Column(Integer, ForeignKey("hotel.id"))
 
 class Order(Base):
