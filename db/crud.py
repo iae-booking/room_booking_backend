@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import select, update
+from sqlalchemy import select, update, and_, or_, not_
 from . import models, schemas
 import datetime
 
@@ -185,22 +185,17 @@ def update_room(db: Session, room_info: schemas.GetAndUpdateRoom):
     return
 
 def search_rooms(db: Session, place: str, number_of_people: int, start_date: datetime.date, end_date: datetime.date):
-    dates = []
-    for i in range(abs(start_date-end_date).days):
-        dates.append(start_date + datetime.timedelta(days=1))
-    result = db.query(models.Room).filter(((models.Hotel.city == place) or (models.Hotel.region == place)) \
-                                       and (models.Room.capacity == number_of_people) and check_clear_dates(dates)).all()
+    result = db.query(models.Room).filter(
+        and_(
+            (models.Room.hotel_id.in_(db.query(models.Hotel.id).filter(
+                or_(
+                    (models.Hotel.city == place),
+                    (models.Hotel.region == place))))),
+            (models.Room.capacity == number_of_people),
+            (or_(
+                (models.Room.id.notin_(db.query(models.Room_order.room_id))),
+                (and_(
+                    (end_date < models.Order.start_date),
+                    (start_date >= models.Order.end_date)))))))\
+        .all()
     return result
-
-def check_clear_dates(dates: list):
-    for date in dates:
-        if date in models.Booking_date.date:
-            return False
-    return True
-
-def place_order(db: Session, order_info: schemas.Order, member_id: int):
-    db_item = models.Order(**order_info.dict(), member_id=member_id)
-    db.add(db_item)
-    db.commit()
-    db.refresh(db_item)
-    return db_item

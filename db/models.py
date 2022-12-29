@@ -17,7 +17,6 @@ class Hotel(Base):
     road_and_number = Column(String)
     transportation = Column(String)
     certificate_number = Column(String)
-    image_path= Column(ARRAY(LargeBinary))
     member_id = Column(Integer, ForeignKey("member.member_id"))
 
 
@@ -53,7 +52,6 @@ class Room(Base):
     installation= Column(String)
     original_price= Column(Integer)
     price= Column(Integer)
-    images= Column(ARRAY(LargeBinary))
     hotel_id = Column(Integer, ForeignKey("hotel.id"))
 
 class Order(Base):
@@ -61,9 +59,9 @@ class Order(Base):
     id = Column(Integer, Sequence('order_id_seq'), primary_key=True)
     start_date = Column(Date)
     end_date = Column(Date)
-    room_id = Column(Integer, ForeignKey("room.id"))
     member_id = Column(Integer, ForeignKey("member.member_id"))
-
+    payment_method = Column(Integer)
+    note = Column(String)
 
 class Rating(Base):
     __tablename__ = "rating"
@@ -73,7 +71,10 @@ class Rating(Base):
     images= Column(ARRAY(LargeBinary))
     order_id = Column(Integer, ForeignKey("order.id"))
 
-class Booking_date(Base):
-    __tablename__ = "booking_date"
-    room_id = Column(Integer, ForeignKey("room.id"), primary_key=True)
-    date = Column(Date, primary_key=True)
+class Room_order(Base):
+    __tablename__ = "room_order"
+    id = Column(Integer, Sequence('room_order_id_seq'), primary_key=True)
+    room_id = Column(Integer, ForeignKey("room.id"))
+    order_id = Column(Integer, ForeignKey("order.id"))
+    fee = Column(Integer)
+    amount = Column(Integer)

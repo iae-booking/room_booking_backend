@@ -75,7 +75,6 @@ class GetAndUpdateRoom(OrmBaseModel):
     installation: Union[str, None]
     original_price: int
     price: int
-    images: Union[str, List[bytes], None] = None
 
 
 class Rate(OrmBaseModel):
@@ -87,14 +86,3 @@ class Rate(OrmBaseModel):
 
 class RequestResult(OrmBaseModel):
     status: str
-
-
-class Search(OrmBaseModel):
-    place: str
-    number_of_people: int
-    start_date: date
-    end_date: date
-class Order(OrmBaseModel):
-    room_id: int
-    start_date: date
-    end_date: date
