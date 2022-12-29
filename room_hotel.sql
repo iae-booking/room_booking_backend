@@ -41,7 +41,7 @@ CREATE TABLE booking.member
     member_id SERIAL NOT NULL,
     phone CHARACTER VARYING(15),
     member_type SMALLINT NOT NULL DEFAULT 0,
-    image BYTEA,
+    images BYTEA,
     PRIMARY KEY (member_id),
     UNIQUE (email, member_id)
 );
@@ -73,7 +73,6 @@ CREATE TABLE booking.room(
     INSTALLATION VARCHAR,
     ORIGINAL_PRICE INT,
     PRICE INT,
-    images BYTEA[],
 	HOTEL_ID INT NOT NULL,
     FOREIGN KEY(HOTEL_ID) REFERENCES booking.hotel(ID)
 );
@@ -137,16 +136,22 @@ CREATE TABLE booking.coupon(
 
 CREATE TABLE booking.order(
   id SERIAL PRIMARY KEY,
-  fee int,
   member_id int NOT NULL,
-  room_id int NOT NULL,
-  amount int,
   payment_method SMALLINT,
   end_date TIMESTAMP,
   start_date TIMESTAMP,
   note varchar,
-  FOREIGN KEY(member_id) REFERENCES booking.member(member_id),
+  FOREIGN KEY(member_id) REFERENCES booking.member(member_id)
+);
+
+CREATE TABLE booking.room_order(
+  id SERIAL PRIMARY KEY,
+  fee int,
+  room_id int NOT NULL,
+  order_id int NOT NULL,
+  amount int,,
   FOREIGN KEY(room_id) REFERENCES booking.room(id)
+  FOREIGN KEY(order_id) REFERENCES booking.order(id)
 );
 
 INSERT INTO booking.member(

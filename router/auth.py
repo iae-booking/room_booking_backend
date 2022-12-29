@@ -57,7 +57,7 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
     return encoded_jwt
 
 
-async def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+async def get_current_user_id(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -74,7 +74,7 @@ async def get_current_user(db: Session = Depends(get_db), token: str = Depends(o
     user = crud.get_user(db, token_data.username) # get_user(fake_user_db, username=token_data.username)
     if user is None:
         raise credentials_exception
-    return user
+    return user.member_id
 
 
 def hash_password(password):
@@ -119,5 +119,5 @@ def get_hashed_password(password: str):
 
 
 @router.get('/user')
-def read_user(current_user: Member = Depends(get_current_user)):
-    return current_user
+def read_user(current_user_id: int = Depends(get_current_user_id)):
+    return current_user_id
