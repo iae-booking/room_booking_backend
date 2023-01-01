@@ -4,6 +4,7 @@ from db import crud, schemas
 from db.database import get_db
 from typing import List
 from fastapi_pagination import Page, paginate, Params
+from router.auth import get_current_user_id
 
 router = APIRouter(
     prefix="/hotels",
@@ -13,14 +14,8 @@ router = APIRouter(
 )
 
 
-def get_member_id():
-    # todo complete this
-    return 1
-
-
-
 @router.get("/own", response_model=List[schemas.HotelForGetUpdate])
-def get_own_hotels(db: Session = Depends(get_db), member_id: int = Depends(get_member_id)):
+def get_own_hotels(db: Session = Depends(get_db), member_id: int = Depends(get_current_user_id)):
     if member_id is False:
         raise HTTPException(status_code=404, detail="User not found")
     hotels = crud.get_own_hotels(db, member_id)
@@ -28,7 +23,7 @@ def get_own_hotels(db: Session = Depends(get_db), member_id: int = Depends(get_m
 
 
 @router.post("/", response_model=schemas.RequestResult)
-def create_hotel(hotel_info: schemas.Hotel, db: Session = Depends(get_db), member_id: int = Depends(get_member_id)):
+def create_hotel(hotel_info: schemas.Hotel, db: Session = Depends(get_db), member_id: int = Depends(get_current_user_id)):
     if member_id is False:
         raise HTTPException(status_code=404, detail="User not found")
     try:
@@ -39,7 +34,7 @@ def create_hotel(hotel_info: schemas.Hotel, db: Session = Depends(get_db), membe
 
 
 @router.put("/")
-def update_hotel(hotel_info: schemas.HotelForGetUpdate, db: Session = Depends(get_db), member_id: int = Depends(get_member_id)):
+def update_hotel(hotel_info: schemas.HotelForGetUpdate, db: Session = Depends(get_db), member_id: int = Depends(get_current_user_id)):
     if not member_id:
         raise HTTPException(status_code=400, detail="user not found")
     if not crud.check_member_owes_hotel(db, member_id, hotel_info.id):
@@ -50,7 +45,7 @@ def update_hotel(hotel_info: schemas.HotelForGetUpdate, db: Session = Depends(ge
     raise HTTPException(status_code=400, detail="error")
 
 @router.delete("/{hotel_id}")
-def del_hotel(hotel_id: int, member_id: int = Depends(get_member_id), db: Session = Depends(get_db)):
+def del_hotel(hotel_id: int, member_id: int = Depends(get_current_user_id), db: Session = Depends(get_db)):
     if not member_id:
         raise HTTPException(status_code=400, detail="user not found")
     if not crud.check_member_owes_hotel(db, member_id, hotel_id):
@@ -62,7 +57,7 @@ def del_hotel(hotel_id: int, member_id: int = Depends(get_member_id), db: Sessio
 
 
 @router.post("/rates", response_model=schemas.RequestResult)
-def rate_hotel(rate_info: schemas.Rate, db: Session = Depends(get_db), member_id: int = Depends(get_member_id)):
+def rate_hotel(rate_info: schemas.Rate, db: Session = Depends(get_db), member_id: int = Depends(get_current_user_id)):
     if member_id is False:
         raise HTTPException(status_code=404, detail="User not found")
     try:
@@ -75,7 +70,7 @@ def rate_hotel(rate_info: schemas.Rate, db: Session = Depends(get_db), member_id
 
 
 @router.put("/rates", response_model=schemas.RequestResult)
-def rate_hotel(rate_info: schemas.Rate, db: Session = Depends(get_db), member_id: int = Depends(get_member_id)):
+def rate_hotel(rate_info: schemas.Rate, db: Session = Depends(get_db), member_id: int = Depends(get_current_user_id)):
     if member_id is False:
         raise HTTPException(status_code=404, detail="User not found")
     try:

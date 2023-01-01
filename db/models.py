@@ -17,6 +17,7 @@ class Hotel(Base):
     road_and_number = Column(String)
     transportation = Column(String)
     certificate_number = Column(String)
+    images= Column(ARRAY(LargeBinary))
     member_id = Column(Integer, ForeignKey("member.member_id"))
 
 
@@ -28,7 +29,7 @@ class Member(Base):
     name = Column(String)
     gender = Column(Integer)
     phone = Column(String)
-    image = Column(LargeBinary)
+    images = Column(LargeBinary)
     member_type = Column(Integer,default=0)
 
 
