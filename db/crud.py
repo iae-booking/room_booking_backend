@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import select, update
+from sqlalchemy import select, update, and_, or_, not_
 from . import models, schemas
+import datetime
 
 
 def get_user(db: Session, email: str):
@@ -184,3 +185,19 @@ def update_room(db: Session, room_info: schemas.GetAndUpdateRoom):
     db.commit()
     db.refresh(db_item)
     return
+
+def search_rooms(db: Session, place: str, number_of_people: int, start_date: datetime.date, end_date: datetime.date):
+    result = db.query(models.Room).filter(
+        and_(
+            (models.Room.hotel_id.in_(db.query(models.Hotel.id).filter(
+                or_(
+                    (models.Hotel.city == place),
+                    (models.Hotel.region == place))))),
+            (models.Room.capacity == number_of_people),
+            (or_(
+                (models.Room.id.notin_(db.query(models.Room_order.room_id))),
+                (and_(
+                    (end_date < models.Order.start_date),
+                    (start_date >= models.Order.end_date)))))))\
+        .all()
+    return result

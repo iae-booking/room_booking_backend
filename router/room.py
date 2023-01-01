@@ -3,6 +3,8 @@ from sqlalchemy.orm import Session
 from db import crud, schemas
 from db.database import get_db
 from fastapi_pagination import Page, paginate, Params
+from typing import List
+import datetime
 from router.auth import get_current_user_id
 
 router = APIRouter(
@@ -38,3 +40,10 @@ def update_room(room_info: schemas.GetAndUpdateRoom, db: Session = Depends(get_d
 @router.get("/", response_model=Page[schemas.GetAndUpdateRoom])
 def get_room(hotel_id: int, params: Params = Depends(), db: Session = Depends(get_db)):
     return paginate(crud.get_rooms_of_hotel(db, hotel_id), params).dict()
+
+@router.get("/search", response_model=List[schemas.GetAndUpdateRoom])
+def search_rooms(*, db: Session = Depends(get_db), place: str, number_of_people: int, start_date: datetime.date, end_date: datetime.date):
+    if start_date >= end_date:
+        raise HTTPException(status_code=400, detail="Date error")
+    rooms = crud.search_rooms(db, place = place, number_of_people = number_of_people, start_date = start_date, end_date = end_date)
+    return rooms

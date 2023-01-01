@@ -85,4 +85,3 @@ class Rate(OrmBaseModel):
 
 class RequestResult(OrmBaseModel):
     status: str
-

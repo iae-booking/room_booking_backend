@@ -58,9 +58,11 @@ class Room(Base):
 class Order(Base):
     __tablename__ = "order"
     id = Column(Integer, Sequence('order_id_seq'), primary_key=True)
-    room_id = Column(Integer)
-    member_id = Column(Integer)
-
+    start_date = Column(Date)
+    end_date = Column(Date)
+    member_id = Column(Integer, ForeignKey("member.member_id"))
+    payment_method = Column(Integer)
+    note = Column(String)
 
 class Rating(Base):
     __tablename__ = "rating"
@@ -69,3 +71,11 @@ class Rating(Base):
     comments = Column(String)
     images= Column(ARRAY(LargeBinary))
     order_id = Column(Integer, ForeignKey("order.id"))
+
+class Room_order(Base):
+    __tablename__ = "room_order"
+    id = Column(Integer, Sequence('room_order_id_seq'), primary_key=True)
+    room_id = Column(Integer, ForeignKey("room.id"))
+    order_id = Column(Integer, ForeignKey("order.id"))
+    fee = Column(Integer)
+    amount = Column(Integer)
