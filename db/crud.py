@@ -85,6 +85,8 @@ def update_hotel(db: Session, hotel_info: schemas.Hotel):
     db.refresh(db_item)
     return db_item
 
+def get_one_hotel(db: Session, hotel_id: int):
+    return db.query(models.Hotel).filter(models.Hotel.id == hotel_id).first()
 
 def delete_hotel(db: Session, hotel_id: int):
     db_item = db.query(models.Hotel).filter(models.Hotel.id == hotel_id).first()
