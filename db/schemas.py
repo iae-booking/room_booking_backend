@@ -85,3 +85,7 @@ class Rate(OrmBaseModel):
 
 class RequestResult(OrmBaseModel):
     status: str
+
+
+class ResponseRequestWithObjectId(RequestResult):
+    id: int

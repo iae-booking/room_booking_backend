@@ -83,6 +83,12 @@ def add_room(db: Session, room_info: schemas.CreateRoom):
     db.refresh(db_item)
     return db_item
 
+def delete_room(db: Session, room_id: int):
+    db_item = db.query(models.Room).filter(models.Room.id == room_id).first()
+    db.delete(db_item)
+    db.commit()
+    return db_item
+
 def update_credit_card(db: Session, credit_card: schemas.CreditCard):
     db_item = db.query(models.CreditCard).filter(models.CreditCard.card_id == credit_card.card_id).first()
     if not db_item:
@@ -140,7 +146,6 @@ def create_hotel(db: Session, hotel_info: schemas.Hotel, member_id: int):
 
 
 def ensure_user_owns_room(db: Session, member_id: int, room_id: int):
-    print(room_id)
     room = db.query(models.Room).filter(models.Room.id == room_id).first()
     result = db.query(models.Hotel).filter(models.Hotel.id == room.hotel_id).first()
     if (result is None) | (result.member_id != member_id):
