@@ -9,7 +9,6 @@ from sqlalchemy.orm import Session
 from db import crud, schemas
 from db.database import get_db
 from db.schemas import Member, Token, CreditCard, MemberCreditCardAndMemberType, MemberInfo, MemberType
-from auth_info import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 from router.auth import get_current_user_id
 
 router = APIRouter(

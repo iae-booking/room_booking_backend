@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from db import crud, schemas
 from db.database import get_db
 from db.schemas import Member, Token, TokenData, CreditCard
-from auth_info import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
+from auth_info import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_DAYS
 
 router = APIRouter(
     prefix="/auth",
@@ -105,7 +105,7 @@ def login(db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = 
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token_expires = timedelta(days=ACCESS_TOKEN_EXPIRE_DAYS)
     access_token = create_access_token(
         data={"sub": user.email}, expires_delta=access_token_expires
     )
