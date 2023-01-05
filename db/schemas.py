@@ -13,19 +13,15 @@ class CreditCard(OrmBaseModel):
     card_id: str
     expire_date: date
 
-class Member(OrmBaseModel):
-    email: EmailStr
-    password: str
-    name: str
-    gender: int
-    phone: Union[str, None] = None
-    images: Union[str, bytes, None] = None
-
 class MemberInfo(OrmBaseModel):
     email: EmailStr
     name: str
     gender: int
     phone: Union[str, None] = None
+    images: Union[List[bytes], None] = None
+
+class Member(MemberInfo):
+    password: str
 
 class MemberCreditCard(MemberInfo):
     credit_cards: List[CreditCard]
@@ -79,7 +75,7 @@ class GetAndUpdateRoom(OrmBaseModel):
 class Rate(OrmBaseModel):
     evaluation: int
     comments: Union[str, None] = None
-    images: Union[str, List[bytes], None] = None
+    images: Union[List[bytes], None] = None
     order_id: int
 
 
