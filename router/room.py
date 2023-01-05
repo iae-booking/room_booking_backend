@@ -48,6 +48,28 @@ def search_rooms(*, db: Session = Depends(get_db), place: str, number_of_people:
     rooms = crud.search_rooms(db, place = place, number_of_people = number_of_people, start_date = start_date, end_date = end_date)
     return rooms
 
+
+@router.post("/order")
+def place_order(shopping_cart: list, order_info: schemas.Order, db: Session = Depends(get_db), member_id: int = Depends(get_member_id)):
+    if member_id is False:
+        raise HTTPException(status_code=404, detail="User not found")
+    if order_info.start_date >= order_info.end_date:
+        raise HTTPException(status_code=400, detail="Date error")
+    try:
+        total_price = [0,0]
+        for room in shopping_cart:
+            if crud.check_rooms(db, order_info.start_date, order_info.end_date, room['room_id']) is False:
+                raise HTTPException(status_code=400, detail="Room is booked")
+        order_id = crud.place_order(db, order_info, member_id)
+        for room in shopping_cart:
+            room_price = crud.place_room_order(db, room['room_id'], room['amount'], order_id)
+            total_price[0] += room_price[0]
+            total_price[1] += room_price[1]
+        return total_price
+    except:
+        return {'status': 'fail'}
+
+
 @router.delete("/{room_id}", response_model=schemas.RequestResult)
 def del_hotel(room_id: int, member_id: int = Depends(get_current_user_id), db: Session = Depends(get_db)):
     if not member_id:
@@ -58,3 +80,4 @@ def del_hotel(room_id: int, member_id: int = Depends(get_current_user_id), db: S
         return {'status': 'success'}
     except:
         return {'status': 'fail'}
+

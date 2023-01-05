@@ -235,8 +235,42 @@ def search_rooms(db: Session, place: str, number_of_people: int, start_date: dat
             (models.Room.capacity == number_of_people),
             (or_(
                 (models.Room.id.notin_(db.query(models.Room_order.room_id))),
-                (and_(
-                    (end_date < models.Order.start_date),
-                    (start_date >= models.Order.end_date)))))))\
+                (end_date < models.Order.start_date),
+                (start_date >= models.Order.end_date)))))\
         .all()
     return result
+
+def place_order(db: Session, order_info: schemas.Order, member_id: int):
+    db_item = models.Order(**order_info.dict(), member_id=member_id)
+    db.add(db_item)
+    db.commit()
+    order_id = db_item.id
+    db.refresh(db_item)
+    return order_id
+
+def place_room_order(db: Session, room_id, amount, order_id):
+    price = db.query(models.Room.price).filter(models.Room.id == room_id).first()
+    original_price = db.query(models.Room.original_price).filter(models.Room.id == room_id).first()
+    db_item = models.Room_order(room_id=room_id, amount=amount, order_id=order_id, fee=price['price'])
+    db.add(db_item)
+    db.commit()
+    db.refresh(db_item)
+    price = [price['price'], (original_price['original_price']-price['price'])]
+    return price
+
+def check_rooms(db: Session, start_date: datetime.date, end_date: datetime.date, room_id: int):
+    result = db.query(models.Room.id).filter(
+        (and_(
+            (models.Room.id == room_id),
+            (or_(
+                (models.Room.id.notin_(db.query(models.Room_order.room_id))),
+                (and_(
+                    (models.Room_order.room_id == room_id),
+                    (or_(
+                        (end_date < models.Order.start_date),
+                        (start_date >= models.Order.end_date))))))))))\
+        .first()
+    if result == None:
+        return False
+    else:
+        return True
