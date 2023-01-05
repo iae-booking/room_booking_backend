@@ -7,6 +7,9 @@ import datetime
 def get_user(db: Session, email: str):
     return db.query(models.Member).filter(models.Member.email == email).first()
 
+def get_user_with_id(db: Session, member_id: str):
+    return db.query(models.Member).filter(models.Member.member_id == member_id).first()
+
 def creat_account(db: Session, user_info: schemas.Member):
     db_item = models.Member(**user_info.dict())
     db.add(db_item)
