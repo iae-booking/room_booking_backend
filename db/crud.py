@@ -10,6 +10,9 @@ def get_user(db: Session, email: str):
 def get_user_with_id(db: Session, member_id: int):
     return db.query(models.Member).filter(models.Member.member_id == member_id).first()
 
+def get_all_users(db: Session):
+    return db.query(models.Member).filter(models.Member.member_type != 2).all()
+
 def upgrade_to_seller(db: Session, member_id: int):
     db_item = db.query(models.Member).filter(models.Member.member_id == member_id).first()
     if not db_item:

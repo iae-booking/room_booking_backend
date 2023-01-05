@@ -30,7 +30,7 @@ def add_credit_card(
     res = crud.db_add_credit_card(db, credit_card, member_id)
     if res:
         return "success"
-    return HTTPException(status_code=400, detail="error")
+    raise HTTPException(status_code=400, detail="error")
 
 @router.put('/credit_card')
 def update_credit_card(
