@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from db import crud, schemas
 from db.database import get_db
-from db.schemas import Member, Token, CreditCard, MemberCreditCard, MemberInfo
+from db.schemas import Member, Token, CreditCard, MemberCreditCardAndMemberType, MemberInfo, MemberType
 from auth_info import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 from router.auth import get_current_user_id
 
@@ -46,17 +46,24 @@ def update_credit_card(
         return "success"
     raise HTTPException(status_code=400, detail="error")
 
-@router.get('/info', response_model=MemberCreditCard)   # show info (include credit cards) of login member
+@router.get('/info', response_model=MemberCreditCardAndMemberType)   # show info (include credit cards) of login member
 def get_member_info(
         member_id: int = Depends(get_current_user_id),
         db: Session = Depends(get_db)
     ):
     res = crud.get_user_with_id(db, member_id)
     res_credit_cards = crud.get_credit_cards_by_member(db, member_id)
-    memberCreditCard = MemberCreditCard(**res.__dict__, credit_cards=res_credit_cards)
+    memberCreditCard = MemberCreditCardAndMemberType(**res.__dict__, credit_cards=res_credit_cards)
     return memberCreditCard
 
 @router.put('/info')
-def update_member_info(member: MemberInfo, db: Session = Depends(get_db), member_id: int = Depends(get_current_user_id),):
+def update_member_info(member: MemberInfo, db: Session = Depends(get_db), member_id: int = Depends(get_current_user_id)):
     res = crud.update_member_info(db, member)
     return "success"
+
+@router.put('/seller')
+def upgrade_to_seller(member_type: MemberType, db: Session = Depends(get_db), member_id: int = Depends(get_current_user_id)):
+    res = crud.update_member_type(db, member_type, member_id)
+    if res:
+        return "success"
+    raise HTTPException(status_code=400, detail="error")

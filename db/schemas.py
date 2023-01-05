@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr
-from typing import Union, List
+from typing import Union, List, Optional
 from datetime import date
 from typing import List
 
@@ -23,8 +23,12 @@ class MemberInfo(OrmBaseModel):
 class Member(MemberInfo):
     password: str
 
-class MemberCreditCard(MemberInfo):
+class MemberCreditCardAndMemberType(MemberInfo):
     credit_cards: List[CreditCard]
+    member_type: int
+
+class MemberType(OrmBaseModel):
+    member_type: int = 0
 
 class Token(OrmBaseModel):
     access_token: str

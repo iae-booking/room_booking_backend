@@ -7,8 +7,22 @@ import datetime
 def get_user(db: Session, email: str):
     return db.query(models.Member).filter(models.Member.email == email).first()
 
-def get_user_with_id(db: Session, member_id: str):
+def get_user_with_id(db: Session, member_id: int):
     return db.query(models.Member).filter(models.Member.member_id == member_id).first()
+
+def upgrade_to_seller(db: Session, member_id: int):
+    db_item = db.query(models.Member).filter(models.Member.member_id == member_id).first()
+    if not db_item:
+        raise ValueError("data not found")
+    stmt = (
+        update(models.Member)
+        .where(models.Member.member_id.in_([member_id]))
+        .values(**{"member_type": 1})
+    )
+    db.execute(stmt)
+    db.commit()
+    db.refresh(db_item)
+    return db_item
 
 def creat_account(db: Session, user_info: schemas.Member):
     db_item = models.Member(**user_info.dict())
@@ -25,6 +39,20 @@ def update_member_info(db: Session, user_info: schemas.MemberInfo):
         update(models.Member)
         .where(models.Member.email.in_([user_info.email]))
         .values(**user_info.dict())
+    )
+    db.execute(stmt)
+    db.commit()
+    db.refresh(db_item)
+    return db_item
+
+def update_member_type(db: Session, member_type: schemas.MemberType, member_id: int):
+    db_item = db.query(models.Member).filter(models.Member.member_id == member_id).first()
+    if not db_item:
+        raise ValueError("data not found")
+    stmt = (
+        update(models.Member)
+        .where(models.Member.member_id.in_([member_id]))
+        .values(**member_type.dict())
     )
     db.execute(stmt)
     db.commit()
