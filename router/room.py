@@ -41,7 +41,7 @@ def update_room(room_info: schemas.GetAndUpdateRoom, db: Session = Depends(get_d
 def get_room(hotel_id: int, params: Params = Depends(), db: Session = Depends(get_db)):
     return paginate(crud.get_rooms_of_hotel(db, hotel_id), params).dict()
 
-@router.get("/search", response_model=List[schemas.GetAndUpdateRoom])
+@router.get("/search", response_model=List[schemas.GetSearchdata])
 def search_rooms(*, db: Session = Depends(get_db), place: str, number_of_people: int, start_date: datetime.date, end_date: datetime.date):
     if start_date >= end_date:
         raise HTTPException(status_code=400, detail="Date error")
@@ -50,22 +50,20 @@ def search_rooms(*, db: Session = Depends(get_db), place: str, number_of_people:
 
 
 @router.post("/order")
-def place_order(shopping_cart: list, order_info: schemas.Order, db: Session = Depends(get_db), member_id: int = Depends(get_member_id)):
+def place_order(shopping_cart: list, order_info: schemas.Order, db: Session = Depends(get_db), member_id: int = Depends(get_current_user_id)):
     if member_id is False:
         raise HTTPException(status_code=404, detail="User not found")
     if order_info.start_date >= order_info.end_date:
         raise HTTPException(status_code=400, detail="Date error")
     try:
-        total_price = [0,0]
         for room in shopping_cart:
             if crud.check_rooms(db, order_info.start_date, order_info.end_date, room['room_id']) is False:
                 raise HTTPException(status_code=400, detail="Room is booked")
         order_id = crud.place_order(db, order_info, member_id)
-        for room in shopping_cart:
-            room_price = crud.place_room_order(db, room['room_id'], room['amount'], order_id)
-            total_price[0] += room_price[0]
-            total_price[1] += room_price[1]
-        return total_price
+        order_result = crud.place_room_order(db, shopping_cart, order_id)
+        order_result.update(order_info)
+        shopping_cart.append(order_result)
+        return shopping_cart
     except:
         return {'status': 'fail'}
 
