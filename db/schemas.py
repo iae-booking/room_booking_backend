@@ -109,6 +109,13 @@ class GetSearchdata(OrmBaseModel):
     room_name: str
     room_price: int
 
+class Order(OrmBaseModel):
+    start_date: date
+    end_date: date
+    payment_method: int
+    note: str
+
+
 class ResponseRequestWithObjectId(RequestResult):
     id: int
 
