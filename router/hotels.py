@@ -44,6 +44,13 @@ def update_hotel(hotel_info: schemas.HotelForGetUpdate, db: Session = Depends(ge
         return "success"
     raise HTTPException(status_code=400, detail="error")
 
+@router.get('/{hotel_id}')
+def get_one_hotel(hotel_id: int, db: Session = Depends(get_db)):
+    res = crud.get_one_hotel(db, hotel_id)
+    if not res:
+        raise HTTPException(status_code=400, detail="hotel not found")
+    return res
+
 @router.delete("/{hotel_id}")
 def del_hotel(hotel_id: int, member_id: int = Depends(get_current_user_id), db: Session = Depends(get_db)):
     if not member_id:

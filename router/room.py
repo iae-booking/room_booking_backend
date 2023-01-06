@@ -14,16 +14,16 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
-@router.post("/", response_model=schemas.RequestResult)
+@router.post("/", response_model=schemas.ResponseRequestWithObjectId)
 def add_room(room_info: schemas.CreateRoom, db: Session = Depends(get_db), member_id: int = Depends(get_current_user_id)):
     if member_id is False:
         raise HTTPException(status_code=404, detail="User not found")
     try:
         crud.ensure_user_owns_hotel(db, member_id, room_info.hotel_id)
-        crud.add_room(db,room_info)
-        return {'status': 'success'}
+        room_db_item = crud.add_room(db,room_info)
+        return {'status': 'success', 'id': room_db_item.id }
     except:
-        return {'status': 'fail'}
+        return {'status': 'fail', 'id': None}
 
 
 @router.put("/", response_model=schemas.RequestResult)
@@ -48,6 +48,7 @@ def search_rooms(*, db: Session = Depends(get_db), place: str, number_of_people:
     rooms = crud.search_rooms(db, place = place, number_of_people = number_of_people, start_date = start_date, end_date = end_date)
     return rooms
 
+
 @router.post("/order")
 def place_order(shopping_cart: list, order_info: schemas.Order, db: Session = Depends(get_db), member_id: int = Depends(get_current_user_id)):
     if member_id is False:
@@ -65,3 +66,16 @@ def place_order(shopping_cart: list, order_info: schemas.Order, db: Session = De
         return shopping_cart
     except:
         return {'status': 'fail'}
+
+
+@router.delete("/{room_id}", response_model=schemas.RequestResult)
+def del_hotel(room_id: int, member_id: int = Depends(get_current_user_id), db: Session = Depends(get_db)):
+    if not member_id:
+        raise HTTPException(status_code=400, detail="user not found")
+    try:
+        crud.ensure_user_owns_room(db, member_id, room_id)
+        crud.delete_room(db, room_id)
+        return {'status': 'success'}
+    except:
+        return {'status': 'fail'}
+

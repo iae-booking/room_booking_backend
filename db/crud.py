@@ -7,6 +7,26 @@ import datetime
 def get_user(db: Session, email: str):
     return db.query(models.Member).filter(models.Member.email == email).first()
 
+def get_user_with_id(db: Session, member_id: int):
+    return db.query(models.Member).filter(models.Member.member_id == member_id).first()
+
+def get_all_users(db: Session):
+    return db.query(models.Member).filter(models.Member.member_type != 2).all()
+
+def upgrade_to_seller(db: Session, member_id: int):
+    db_item = db.query(models.Member).filter(models.Member.member_id == member_id).first()
+    if not db_item:
+        raise ValueError("data not found")
+    stmt = (
+        update(models.Member)
+        .where(models.Member.member_id.in_([member_id]))
+        .values(**{"member_type": 1})
+    )
+    db.execute(stmt)
+    db.commit()
+    db.refresh(db_item)
+    return db_item
+
 def creat_account(db: Session, user_info: schemas.Member):
     db_item = models.Member(**user_info.dict())
     db.add(db_item)
@@ -22,6 +42,20 @@ def update_member_info(db: Session, user_info: schemas.MemberInfo):
         update(models.Member)
         .where(models.Member.email.in_([user_info.email]))
         .values(**user_info.dict())
+    )
+    db.execute(stmt)
+    db.commit()
+    db.refresh(db_item)
+    return db_item
+
+def update_member_type(db: Session, member_type: schemas.MemberType, member_id: int):
+    db_item = db.query(models.Member).filter(models.Member.member_id == member_id).first()
+    if not db_item:
+        raise ValueError("data not found")
+    stmt = (
+        update(models.Member)
+        .where(models.Member.member_id.in_([member_id]))
+        .values(**member_type.dict())
     )
     db.execute(stmt)
     db.commit()
@@ -47,6 +81,12 @@ def add_room(db: Session, room_info: schemas.CreateRoom):
     db.add(db_item)
     db.commit()
     db.refresh(db_item)
+    return db_item
+
+def delete_room(db: Session, room_id: int):
+    db_item = db.query(models.Room).filter(models.Room.id == room_id).first()
+    db.delete(db_item)
+    db.commit()
     return db_item
 
 def update_credit_card(db: Session, credit_card: schemas.CreditCard):
@@ -86,6 +126,8 @@ def update_hotel(db: Session, hotel_info: schemas.Hotel):
     db.refresh(db_item)
     return db_item
 
+def get_one_hotel(db: Session, hotel_id: int):
+    return db.query(models.Hotel).filter(models.Hotel.id == hotel_id).first()
 
 def delete_hotel(db: Session, hotel_id: int):
     db_item = db.query(models.Hotel).filter(models.Hotel.id == hotel_id).first()
@@ -104,7 +146,6 @@ def create_hotel(db: Session, hotel_info: schemas.Hotel, member_id: int):
 
 
 def ensure_user_owns_room(db: Session, member_id: int, room_id: int):
-    print(room_id)
     room = db.query(models.Room).filter(models.Room.id == room_id).first()
     result = db.query(models.Hotel).filter(models.Hotel.id == room.hotel_id).first()
     if (result is None) | (result.member_id != member_id):

@@ -1,5 +1,5 @@
 from fastapi import Depends, FastAPI, HTTPException
-from router import hello, auth, hotels, member, room
+from router import hello, auth, hotels, member, room, admin
 from db import models
 from db.database import engine
 from mangum import Mangum
@@ -20,9 +20,10 @@ app.add_middleware(
 
 app.include_router(hello.router)
 app.include_router(auth.router)
-app.include_router(hotels.router)
 app.include_router(member.router)
+app.include_router(hotels.router)
 app.include_router(room.router)
+app.include_router(admin.router)
 
 @app.get('/')
 def home():
