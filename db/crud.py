@@ -185,7 +185,8 @@ def update_room(db: Session, room_info: schemas.GetAndUpdateRoom):
     return
 
 def search_rooms(db: Session, place: str, number_of_people: int, start_date: datetime.date, end_date: datetime.date):
-    result = db.query(models.Room).filter(
+    result = []
+    room_id = db.query(models.Room.id).filter(
         and_(
             (models.Room.hotel_id.in_(db.query(models.Hotel.id).filter(
                 or_(
@@ -197,6 +198,9 @@ def search_rooms(db: Session, place: str, number_of_people: int, start_date: dat
                 (end_date < models.Order.start_date),
                 (start_date >= models.Order.end_date)))))\
         .all()
+    for hotel_id, hotel_name, hotel_image, hotel_city, hotel_region, hotel_road_and_number, room_name, room_price in \
+        db.query(models.Hotel.id, models.Hotel.hotel_name, models.Hotel.images, models.Hotel.city, models.Hotel.region, models.Hotel.road_and_number, models.Room.room_name, models.Room.price):
+        result.append({"hotel_id": hotel_id, "hotel_name": hotel_name, "hotel_image": hotel_image, "hotel_location": hotel_city + hotel_region + hotel_road_and_number, "room_name": room_name, "room_price": room_price})
     return result
 
 def place_order(db: Session, order_info: schemas.Order, member_id: int):
@@ -207,15 +211,18 @@ def place_order(db: Session, order_info: schemas.Order, member_id: int):
     db.refresh(db_item)
     return order_id
 
-def place_room_order(db: Session, room_id, amount, order_id):
-    price = db.query(models.Room.price).filter(models.Room.id == room_id).first()
-    original_price = db.query(models.Room.original_price).filter(models.Room.id == room_id).first()
-    db_item = models.Room_order(room_id=room_id, amount=amount, order_id=order_id, fee=price['price'])
-    db.add(db_item)
-    db.commit()
-    db.refresh(db_item)
-    price = [price['price'], (original_price['original_price']-price['price'])]
-    return price
+def place_room_order(db: Session, room_list, order_id):
+    total_price = {'save': 0,'price': 0}
+    for room in room_list:
+        price = db.query(models.Room.price).filter(models.Room.id == room['room_id']).first()
+        original_price = db.query(models.Room.original_price).filter(models.Room.id == room['room_id']).first()
+        db_item = models.Room_order(room_id=room['room_id'], amount=room['amount'], order_id=order_id, fee=price['price'])
+        db.add(db_item)
+        db.commit()
+        db.refresh(db_item)
+        total_price['save'] += original_price['original_price'] - price['price']
+        total_price['price'] += price['price']
+    return total_price
 
 def check_rooms(db: Session, start_date: datetime.date, end_date: datetime.date, room_id: int):
     result = db.query(models.Room.id).filter(
