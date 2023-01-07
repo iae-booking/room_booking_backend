@@ -86,6 +86,28 @@ class Rate(OrmBaseModel):
 class RequestResult(OrmBaseModel):
     status: str
 
+class Order(OrmBaseModel):
+    start_date: date
+    end_date: date
+    payment_method: int
+    note: str
+
+class GetOrderInfo(OrmBaseModel):
+    room_list: list
+    start_date: date
+    end_date: date
+    payment_method: int
+    save: int
+    price: int
+    note: str
+
+class GetSearchdata(OrmBaseModel):
+    hotel_id: int
+    hotel_name: str
+    hotel_image: Union[List[bytes], None] = None
+    hotel_location: str
+    room_name: str
+    room_price: int
 
 class Order(OrmBaseModel):
     start_date: date
