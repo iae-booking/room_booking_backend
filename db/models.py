@@ -1,5 +1,6 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Sequence, Date, LargeBinary
 from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.orm import relationship
 from .database import Base
 
 
@@ -19,6 +20,12 @@ class Hotel(Base):
     certificate_number = Column(String)
     images= Column(ARRAY(LargeBinary))
     member_id = Column(Integer, ForeignKey("member.member_id"))
+    rooms = relationship(
+        "Room",
+        back_populates="hotel",
+        cascade="all, delete",
+        passive_deletes=True,
+    )
 
 
 class Member(Base):
@@ -53,7 +60,8 @@ class Room(Base):
     installation= Column(String)
     original_price= Column(Integer)
     price= Column(Integer)
-    hotel_id = Column(Integer, ForeignKey("hotel.id"))
+    hotel_id = Column(Integer, ForeignKey("hotel.id", ondelete="cascade"))
+    hotel = relationship("Hotel", back_populates="rooms")
 
 class Order(Base):
     __tablename__ = "order"

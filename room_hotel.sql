@@ -29,7 +29,7 @@ CREATE TABLE booking.credit_cards
     member_id   INT NOT NULL,
     PRIMARY KEY (card_id),
     UNIQUE (card_id),
-    FOREIGN KEY(MEMBER_ID) REFERENCES booking.member(MEMBER_ID)
+    FOREIGN KEY(MEMBER_ID) REFERENCES booking.member(MEMBER_ID) ON DELETE CASCADE
 );
 
 CREATE TABLE booking.member
@@ -59,7 +59,7 @@ CREATE TABLE booking.hotel(
     CERTIFICATE_NUMBER VARCHAR,
     images BYTEA[],
 	MEMBER_ID INT NOT NULL,
-    FOREIGN KEY(MEMBER_ID) REFERENCES booking.member(MEMBER_ID)
+    FOREIGN KEY(MEMBER_ID) REFERENCES booking.member(MEMBER_ID) ON DELETE CASCADE
 );
 
 -- ROOM
@@ -74,7 +74,7 @@ CREATE TABLE booking.room(
     ORIGINAL_PRICE INT,
     PRICE INT,
 	HOTEL_ID INT NOT NULL,
-    FOREIGN KEY(HOTEL_ID) REFERENCES booking.hotel(ID)
+    FOREIGN KEY(HOTEL_ID) REFERENCES booking.hotel(ID) ON DELETE CASCADE
 );
 -- facilities
 CREATE TABLE booking.facilities(

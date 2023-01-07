@@ -50,7 +50,7 @@ def search_rooms(*, db: Session = Depends(get_db), place: str, number_of_people:
 
 
 @router.post("/order")
-def place_order(shopping_cart: list, order_info: schemas.Order, db: Session = Depends(get_db), member_id: int = Depends(get_member_id)):
+def place_order(shopping_cart: list, order_info: schemas.Order, db: Session = Depends(get_db), member_id: int = Depends(get_current_user_id)):
     if member_id is False:
         raise HTTPException(status_code=404, detail="User not found")
     if order_info.start_date >= order_info.end_date:
