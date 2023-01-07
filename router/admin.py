@@ -27,3 +27,18 @@ def get_member_info(
     if(not res):
         raise HTTPException(status_code=400, detail="no data found")
     return res
+
+@router.delete('/member')
+def delete_member(
+        email: str,
+        member_id: int = Depends(get_current_user_id),
+        db: Session = Depends(get_db)
+    ):
+    user = crud.get_user_with_id(db, member_id)
+    if(user.member_type != 2):
+        raise HTTPException(status_code=401, detail="not admin")
+    try:
+        res = crud.delete_user(db, email)
+        return res
+    except:
+        raise HTTPException(status_code=400, detail="no data found or other error")

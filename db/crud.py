@@ -16,6 +16,12 @@ def get_all_users(db: Session):
 def get_user_with_name(db: Session, name: str):
     return db.query(models.Member).filter(models.Member.name == name).first()
 
+def delete_user(db: Session, email:str):
+    db_item = db.query(models.Member).filter(models.Member.email == email).first()
+    db.delete(db_item)
+    db.commit()
+    return db_item
+
 def upgrade_to_seller(db: Session, member_id: int):
     db_item = db.query(models.Member).filter(models.Member.member_id == member_id).first()
     if not db_item:
