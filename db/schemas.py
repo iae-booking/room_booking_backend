@@ -119,3 +119,20 @@ class Order(OrmBaseModel):
 class ResponseRequestWithObjectId(RequestResult):
     id: int
 
+
+class CouponInfo(OrmBaseModel):
+    type: int
+    discount: str
+    start_date: date
+    end_date: date
+
+class CouponOwn(CouponInfo):
+    member_id: int
+
+class CouponGet(CouponOwn):
+    id: int
+
+class UsedCoupon(OrmBaseModel):
+    coupon_id: int
+    order_id: int
+    usage_date: date

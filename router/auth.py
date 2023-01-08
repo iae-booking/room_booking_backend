@@ -33,7 +33,7 @@ fake_user_db = {
 
 
 def auth_user(db, email: str, password: str):
-    user = crud.get_user(db, email)
+    user = crud.get_user_with_email(db, email)
     if not user:
         return False
     print(user.password)
@@ -71,7 +71,7 @@ async def get_current_user_id(db: Session = Depends(get_db), token: str = Depend
         token_data = TokenData(username=username)
     except JWTError:
         raise credentials_exception
-    user = crud.get_user(db, token_data.username) # get_user(fake_user_db, username=token_data.username)
+    user = crud.get_user_with_email(db, token_data.username) # get_user(fake_user_db, username=token_data.username)
     if user is None:
         raise credentials_exception
     return user.member_id
@@ -84,7 +84,7 @@ def hash_password(password):
 @router.post("/register")
 def register(user_info: Member, db: Session = Depends(get_db)):
     # check if username exist
-    result = crud.get_user(db, user_info.dict()["email"])
+    result = crud.get_user_with_email(db, user_info.dict()["email"])
     if result is not None:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
