@@ -14,7 +14,7 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
-@router.get('/member/{email}', response_model=MemberInfo)
+@router.get('/member/{email}')
 def get_member_info(
         email: str,
         member_id: int = Depends(get_current_user_id),
