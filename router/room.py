@@ -41,7 +41,7 @@ def update_room(room_info: schemas.GetAndUpdateRoom, db: Session = Depends(get_d
 def get_room(hotel_id: int, params: Params = Depends(), db: Session = Depends(get_db)):
     return paginate(crud.get_rooms_of_hotel(db, hotel_id), params).dict()
 
-@router.get("/search", response_model=List[schemas.GetSearchdata])
+@router.get("/search")#, response_model=List[schemas.GetSearchdata])
 def search_rooms(*, db: Session = Depends(get_db), place: str, number_of_people: int, start_date: datetime.date, end_date: datetime.date):
     if start_date >= end_date:
         raise HTTPException(status_code=400, detail="Date error")
