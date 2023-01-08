@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select, update, and_, or_, not_
 from . import models, schemas
 import datetime
+from datetime import date
 
 
 def get_user_with_email(db: Session, email: str):
@@ -303,3 +304,10 @@ def create_coupon(db:Session, coupon: schemas.CouponInfo, member_id: int):
 
 def get_used_coupon_for_order(db:Session, order_id: int):
     return db.query(models.Used_Coupon).filter(models.Used_Coupon.order_id == order_id).first()
+
+def use_coupon(db: Session, order_id: int, coupon_id: int, usage_date: date):
+    db_item = models.Used_Coupon(order_id=order_id, coupon_id=coupon_id, usage_date=usage_date)
+    db.add(db_item)
+    db.commit()
+    db.refresh(db_item)
+    return db_item

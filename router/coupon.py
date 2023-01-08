@@ -6,6 +6,7 @@ from db import crud, schemas
 from db.database import get_db
 from db.schemas import Member, Token, CreditCard, MemberCreditCardAndMemberType, MemberInfo, MemberType
 from router.auth import get_current_user_id
+from datetime import date
 
 router = APIRouter(
     prefix="/coupon",
@@ -36,6 +37,7 @@ def create_coupon(
         raise HTTPException(status_code=400, detail="no data found")
     return res
 
+'''
 @router.get('/order/{order_id}')
 def get_coupon_for_order(
         order_id: int,
@@ -47,3 +49,17 @@ def get_coupon_for_order(
     if(not res):
         raise HTTPException(status_code=400, detail="no data found")
     return res
+
+@router.post('/order')
+def use_coupon(
+        order_id: int,
+        coupon_id: int,
+        _: int = Depends(get_current_user_id),
+        db: Session = Depends(get_db)
+    ):
+    res = crud.use_coupon(db, order_id, coupon_id, usage_date=date.today())
+    print(res)
+    if(not res):
+        raise HTTPException(status_code=400, detail="no data found")
+    return res
+'''
