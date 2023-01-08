@@ -312,3 +312,20 @@ def use_coupon(db: Session, order_id: int, coupon_id: int, usage_date: date):
     db.commit()
     db.refresh(db_item)
     return db_item
+
+def get_historical_order(db: Session, member_id: int):
+    order_list = []
+    for name, order_id, start_date, end_date in db.query(models.Member.name, models.Order.id, models.Order.start_date, models.Order.end_date)\
+            .filter(
+            (and_(
+                (models.Order.member_id == member_id),
+                (models.Member.member_id == member_id)))):
+        room_list = ''
+        for room_name, amount in db.query(models.Room.room_name, models.Room_order.amount)\
+            .filter(
+            (and_(
+                (models.Room_order.order_id == order_id),
+                (models.Room.id == models.Room_order.room_id)))):
+            room_list += str(room_name) + str(amount) + '間'
+        order_list.append({"name": name, "rooms": room_list, "date": (str(start_date) + "-" + str(end_date))})
+    return order_list

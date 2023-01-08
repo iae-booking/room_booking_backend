@@ -136,3 +136,8 @@ class UsedCoupon(OrmBaseModel):
     coupon_id: int
     order_id: int
     usage_date: date
+
+class historical_order(OrmBaseModel):
+    name: str
+    rooms: str
+    date: str
