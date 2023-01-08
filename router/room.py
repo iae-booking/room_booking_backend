@@ -79,3 +79,9 @@ def del_hotel(room_id: int, member_id: int = Depends(get_current_user_id), db: S
     except:
         return {'status': 'fail'}
 
+@router.get("/get_historical_order", response_model=List[schemas.historical_order])
+def get_historical_order(db: Session = Depends(get_db), member_id: int = Depends(get_current_user_id)):
+    if not member_id:
+        raise HTTPException(status_code=400, detail="user not found")
+    orders = crud.get_historical_order(db, member_id)
+    return orders

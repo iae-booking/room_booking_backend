@@ -237,21 +237,22 @@ def update_room(db: Session, room_info: schemas.GetAndUpdateRoom):
 
 def search_rooms(db: Session, place: str, number_of_people: int, start_date: datetime.date, end_date: datetime.date):
     result = []
-    room_id = db.query(models.Room.id).filter(
-        and_(
-            (models.Room.hotel_id.in_(db.query(models.Hotel.id).filter(
-                or_(
-                    (models.Hotel.city == place),
-                    (models.Hotel.region == place))))),
-            (models.Room.capacity == number_of_people),
-            (or_(
-                (models.Room.id.notin_(db.query(models.Room_order.room_id))),
-                (end_date < models.Order.start_date),
-                (start_date >= models.Order.end_date)))))\
-        .all()
-    for hotel_id, hotel_name, hotel_image, hotel_city, hotel_region, hotel_road_and_number, room_name, room_price in \
-        db.query(models.Hotel.id, models.Hotel.hotel_name, models.Hotel.images, models.Hotel.city, models.Hotel.region, models.Hotel.road_and_number, models.Room.room_name, models.Room.price):
-        result.append({"hotel_id": hotel_id, "hotel_name": hotel_name, "hotel_image": hotel_image, "hotel_location": hotel_city + hotel_region + hotel_road_and_number, "room_name": room_name, "room_price": room_price})
+    room_id = []
+    for id in db.query(models.Room.id).filter(
+            and_(
+                (models.Room.hotel_id.in_(db.query(models.Hotel.id).filter(
+                    or_(
+                        (models.Hotel.city == place),
+                        (models.Hotel.region == place))))),
+                (models.Room.capacity == number_of_people),
+                (or_(
+                    (models.Room.id.notin_(db.query(models.Room_order.room_id))),
+                    (end_date < models.Order.start_date),
+                    (start_date >= models.Order.end_date))))):
+        room_id.append(id["id"])
+    for hotel_id, member_id, hotel_name, hotel_image, hotel_city, hotel_region, hotel_road_and_number, room_name, room_price in \
+        db.query(models.Hotel.id, models.Member.member_id, models.Hotel.hotel_name, models.Hotel.images, models.Hotel.city, models.Hotel.region, models.Hotel.road_and_number, models.Room.room_name, models.Room.price).filter(models.Room.id.in_(room_id)):
+        result.append({"hotel_id": hotel_id, "member_id": member_id, "hotel_name": hotel_name, "hotel_image": hotel_image, "hotel_location": hotel_city + hotel_region + hotel_road_and_number, "room_name": room_name, "room_price": room_price})
     return result
 
 def place_order(db: Session, order_info: schemas.Order, member_id: int):
@@ -311,3 +312,20 @@ def use_coupon(db: Session, order_id: int, coupon_id: int, usage_date: date):
     db.commit()
     db.refresh(db_item)
     return db_item
+
+def get_historical_order(db: Session, member_id: int):
+    order_list = []
+    for name, order_id, start_date, end_date in db.query(models.Member.name, models.Order.id, models.Order.start_date, models.Order.end_date)\
+            .filter(
+            (and_(
+                (models.Order.member_id == member_id),
+                (models.Member.member_id == member_id)))):
+        room_list = ''
+        for room_name, amount in db.query(models.Room.room_name, models.Room_order.amount)\
+            .filter(
+            (and_(
+                (models.Room_order.order_id == order_id),
+                (models.Room.id == models.Room_order.room_id)))):
+            room_list += str(room_name) + str(amount) + '間'
+        order_list.append({"name": name, "rooms": room_list, "date": (str(start_date) + "-" + str(end_date))})
+    return order_list
