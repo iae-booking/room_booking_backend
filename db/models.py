@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Sequence, Date, LargeBinary
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Sequence, Date, LargeBinary, SmallInteger
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import relationship
 from .database import Base
@@ -87,3 +87,18 @@ class Room_order(Base):
     order_id = Column(Integer, ForeignKey("order.id"))
     fee = Column(Integer)
     amount = Column(Integer)
+
+class Coupon(Base):
+    __tablename__ = "coupon"
+    id = Column(Integer, Sequence('coupon_id_seq'), primary_key=True)
+    type = Column(SmallInteger)
+    member_id = Column(Integer, ForeignKey("member.member_id"))
+    discount = Column(String)
+    start_date = Column(Date)
+    end_date = Column(Date)
+
+class Used_Coupon(Base):
+    __tablename__ = "usedcoupon"
+    coupon_id = Column(Integer, ForeignKey("coupon.id"), primary_key=True)
+    order_id = Column(Integer, ForeignKey("order.id"), primary_key=True)
+    usage_date = Column(Date)

@@ -114,14 +114,14 @@ CREATE TABLE booking.rating(
 
 CREATE TABLE booking.usedcoupon
 (
-    member_id SERIAL NOT NULL,
+    member_id integer NOT NULL,
     coupon_id integer NOT NULL,
     order_id    integer  NOT NULL,
     Usage_date timestamp without time zone,
-    FOREIGN KEY(member_id) REFERENCES booking.member(member_id),
-    FOREIGN KEY(coupon_id) REFERENCES booking.coupon(id),
-    FOREIGN KEY(order_id) REFERENCES booking.order(id),
-    PRIMARY KEY (member_id,coupon_id)
+    FOREIGN KEY(member_id) REFERENCES booking.member(member_id) ON DELETE CASCADE,
+    FOREIGN KEY(coupon_id) REFERENCES booking.coupon(id) ON DELETE CASCADE,
+    FOREIGN KEY(order_id) REFERENCES booking.order(id) ON DELETE CASCADE,
+    PRIMARY KEY (member_id,coupon_id, order_id)
 );
 
 CREATE TABLE booking.coupon(
@@ -131,7 +131,7 @@ CREATE TABLE booking.coupon(
   discount varchar,
   end_date TIMESTAMP,
   start_date TIMESTAMP,
-  FOREIGN KEY(member_id) REFERENCES booking.member(member_id)
+  FOREIGN KEY(member_id) REFERENCES booking.member(member_id) ON DELETE CASCADE
 );
 
 CREATE TABLE booking.order(

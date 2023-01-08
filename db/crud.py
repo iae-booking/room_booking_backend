@@ -290,3 +290,16 @@ def check_rooms(db: Session, start_date: datetime.date, end_date: datetime.date,
         return False
     else:
         return True
+
+def get_coupon_with_id(db: Session, member_id: int):
+    return db.query(models.Coupon).filter(models.Coupon.member_id == member_id).all()
+
+def create_coupon(db:Session, coupon: schemas.CouponInfo, member_id: int):
+    db_item = models.Coupon(**coupon.dict(), member_id=member_id)
+    db.add(db_item)
+    db.commit()
+    db.refresh(db_item)
+    return db_item
+
+def get_used_coupon_for_order(db:Session, order_id: int):
+    return db.query(models.Used_Coupon).filter(models.Used_Coupon.order_id == order_id).first()

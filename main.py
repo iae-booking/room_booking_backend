@@ -1,5 +1,5 @@
 from fastapi import Depends, FastAPI, HTTPException
-from router import hello, auth, hotels, member, room, admin
+from router import hello, auth, hotels, member, room, admin, coupon
 from db import models
 from db.database import engine
 from mangum import Mangum
@@ -23,6 +23,7 @@ app.include_router(auth.router)
 app.include_router(member.router)
 app.include_router(hotels.router)
 app.include_router(room.router)
+app.include_router(coupon.router)
 app.include_router(admin.router)
 
 @app.get('/')
