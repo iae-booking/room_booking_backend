@@ -268,12 +268,12 @@ def place_room_order(db: Session, room_list, order_id):
     for room in room_list:
         price = db.query(models.Room.price).filter(models.Room.id == room['room_id']).first()
         original_price = db.query(models.Room.original_price).filter(models.Room.id == room['room_id']).first()
-        db_item = models.Room_order(room_id=room['room_id'], amount=room['amount'], order_id=order_id, fee=price['price'])
+        db_item = models.Room_order(room_id=room['room_id'], amount=room['amount'], order_id=order_id, fee=(price['price'] * room['amount']))
         db.add(db_item)
         db.commit()
         db.refresh(db_item)
-        total_price['save'] += original_price['original_price'] - price['price']
-        total_price['price'] += price['price']
+        total_price['save'] += (original_price['original_price'] - price['price']) * room['amount']
+        total_price['price'] += price['price'] * room['amount']
     return total_price
 
 def check_rooms(db: Session, start_date: datetime.date, end_date: datetime.date, room_id: int):
@@ -315,17 +315,19 @@ def use_coupon(db: Session, order_id: int, coupon_id: int, usage_date: date):
 
 def get_historical_order(db: Session, member_id: int):
     order_list = []
-    for name, order_id, start_date, end_date in db.query(models.Member.name, models.Order.id, models.Order.start_date, models.Order.end_date)\
-            .filter(
-            (and_(
-                (models.Order.member_id == member_id),
-                (models.Member.member_id == member_id)))):
+    for order_id, start_date, end_date in db.query(models.Order.id, models.Order.start_date, models.Order.end_date).filter(models.Order.member_id == member_id):
         room_list = ''
-        for room_name, amount in db.query(models.Room.room_name, models.Room_order.amount)\
+        total_price = 0
+        hotel = []
+        for hotel_name, hotel_city, hotel_region, hotel_road_and_number, room_name, amount, price in \
+                db.query(models.Hotel.hotel_name, models.Hotel.city, models.Hotel.region, models.Hotel.road_and_number, models.Room.room_name, models.Room_order.amount, models.Room_order.fee)\
             .filter(
             (and_(
                 (models.Room_order.order_id == order_id),
-                (models.Room.id == models.Room_order.room_id)))):
+                (models.Room.id == models.Room_order.room_id),
+                (models.Hotel.id == models.Room.hotel_id)))):
+            hotel = [str(hotel_name), str(hotel_city + hotel_region + hotel_road_and_number)]
             room_list += str(room_name) + str(amount) + '間'
-        order_list.append({"name": name, "rooms": room_list, "date": (str(start_date) + "-" + str(end_date))})
+            total_price += price
+        order_list.append({"hotel_name": hotel[0], "hotel_addr": hotel[1], "rooms": room_list, "price": total_price, "date": (str(start_date) + "-" + str(end_date))})
     return order_list

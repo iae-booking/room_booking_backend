@@ -138,6 +138,8 @@ class UsedCoupon(OrmBaseModel):
     usage_date: date
 
 class historical_order(OrmBaseModel):
-    name: str
+    hotel_name: str
+    hotel_addr: str
     rooms: str
+    price: int
     date: str
