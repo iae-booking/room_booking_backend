@@ -243,11 +243,11 @@ def search_rooms(db: Session, place: str, number_of_people: int, start_date: dat
             and_(
                 (models.Room.hotel_id.in_(db.query(models.Hotel.id).filter(
                     or_(
-                        (models.Hotel.city == place),
-                        (models.Hotel.region == place))))),
+                        (models.Hotel.city.like("%" + place + "%")),
+                        (models.Hotel.region.like("%" + place + "%")))))),
                 (models.Room.capacity == number_of_people))):
         room_id.append(id)
-        room_amount.append((amount))
+        room_amount.append(amount)
     for id in range(len(room_id)):
         for room_order in db.query(models.Room_order.id).filter(
             and_(
@@ -264,13 +264,13 @@ def search_rooms(db: Session, place: str, number_of_people: int, start_date: dat
             del(room_id[id])
             del(room_amount[id])
     for room in room_id:
-        for hotel_id, member_id, hotel_name, hotel_city, hotel_region, hotel_road_and_number, room_name, room_price in \
-            db.query(models.Hotel.id, models.Member.member_id, models.Hotel.hotel_name, models.Hotel.city, models.Hotel.region, models.Hotel.road_and_number, models.Room.room_name, models.Room.price)\
+        for hotel_id, member_id, hotel_name, hotel_image, hotel_city, hotel_region, hotel_road_and_number, room_name, room_price in \
+            db.query(models.Hotel.id, models.Member.member_id, models.Hotel.hotel_name, models.Hotel.images, models.Hotel.city, models.Hotel.region, models.Hotel.road_and_number, models.Room.room_name, models.Room.price)\
                     .filter(
                 and_(
                     models.Hotel.id == models.Room.hotel_id,
                     models.Room.id == room)):
-            result.append({"hotel_id": hotel_id, "member_id": member_id, "hotel_name": hotel_name, "hotel_image": None, "hotel_location": hotel_city + hotel_region + hotel_road_and_number, "room_name": room_name, "room_price": room_price})
+            result.append({"hotel_id": hotel_id, "member_id": member_id, "hotel_name": hotel_name, "hotel_image": hotel_image, "hotel_location": hotel_city + hotel_region + hotel_road_and_number, "room_name": room_name, "room_price": room_price})
             break
     return result
 
