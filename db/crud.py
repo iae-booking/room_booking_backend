@@ -249,7 +249,7 @@ def search_rooms(db: Session, place: str, number_of_people: int, start_date: dat
         room_id.append(id)
         room_amount.append(amount)
     for id in range(len(room_id)):
-        for room_order in db.query(models.Room_order.id).filter(
+        for amount in db.query(models.Room_order.amount).filter(
             and_(
                 models.Room_order.room_id == room_id[id],
                 models.Order.id == models.Room_order.order_id,
@@ -258,16 +258,16 @@ def search_rooms(db: Session, place: str, number_of_people: int, start_date: dat
                     start_date < models.Order.end_date
                 )
             )):
-            room_amount[id] -= 1
+            room_amount[id] -= amount
     for id in range(len(room_id)):
         if room_amount[id] == 0:
             del(room_id[id])
             del(room_amount[id])
     hotel_ids = []
     for num in range(len(room_id)):
-        for hotel_id, member_id, hotel_name, hotel_image, hotel_city, hotel_region, hotel_road_and_number, room_name, room_price, room_introduction in \
+        for hotel_id, member_id, hotel_name, hotel_image, hotel_city, hotel_region, hotel_road_and_number, hotel_introduction, room_name, room_price in \
             db.query(models.Hotel.id, models.Member.member_id, models.Hotel.hotel_name, models.Hotel.images, models.Hotel.city,
-                     models.Hotel.region, models.Hotel.road_and_number, models.Room.room_name, models.Room.price, models.Room.introduction)\
+                     models.Hotel.region, models.Hotel.road_and_number, models.Hotel.introduction, models.Room.room_name, models.Room.price)\
                     .filter(
                 and_(
                     models.Hotel.id == models.Room.hotel_id,
@@ -275,8 +275,8 @@ def search_rooms(db: Session, place: str, number_of_people: int, start_date: dat
             if hotel_id not in hotel_ids:
                 hotel_ids.append(hotel_id)
                 result.append({"hotel_id": hotel_id, "member_id": member_id, "hotel_name": hotel_name, "hotel_image": hotel_image,
-                               "hotel_location": hotel_city + hotel_region + hotel_road_and_number, "room_name": room_name,
-                               "room_price": room_price, "left": room_amount[num], "room_introduction": room_introduction})
+                               "hotel_location": hotel_city + hotel_region + hotel_road_and_number, "hotel_introduction": hotel_introduction,
+                               "room_name": room_name,"room_price": room_price, "left": room_amount[num]})
             break
     return result
 
@@ -288,35 +288,35 @@ def place_order(db: Session, order_info: schemas.Order, member_id: int):
     db.refresh(db_item)
     return order_id
 
-def place_room_order(db: Session, room_list, order_id):
+def place_room_order(db: Session, room_list: list, order_id: int):
     total_price = {'save': 0,'price': 0}
     for room in room_list:
-        price = db.query(models.Room.price).filter(models.Room.id == room['room_id']).first()
-        original_price = db.query(models.Room.original_price).filter(models.Room.id == room['room_id']).first()
-        db_item = models.Room_order(room_id=room['room_id'], amount=room['amount'], order_id=order_id, fee=(price['price'] * room['amount']))
-        db.add(db_item)
-        db.commit()
-        db.refresh(db_item)
-        total_price['save'] += (original_price['original_price'] - price['price']) * room['amount']
-        total_price['price'] += price['price'] * room['amount']
+        for price, original_price in db.query(models.Room.price, models.Room.original_price).filter(models.Room.id == room['room_id']):
+            db_item = models.Room_order(room_id=room['room_id'], amount=room['amount'], order_id=order_id, fee=(price['price'] * room['amount']))
+            db.add(db_item)
+            db.commit()
+            db.refresh(db_item)
+            total_price['save'] += (original_price['original_price'] - price['price']) * room['amount']
+            total_price['price'] += price['price'] * room['amount']
+            break
     return total_price
 
-def check_rooms(db: Session, start_date: datetime.date, end_date: datetime.date, room_id: int):
-    result = db.query(models.Room.id).filter(
-        (and_(
-            (models.Room.id == room_id),
-            (or_(
-                (models.Room.id.notin_(db.query(models.Room_order.room_id))),
-                (and_(
-                    (models.Room_order.room_id == room_id),
-                    (or_(
-                        (end_date < models.Order.start_date),
-                        (start_date >= models.Order.end_date))))))))))\
-        .first()
-    if result == None:
-        return False
-    else:
-        return True
+def check_rooms(db: Session, start_date: datetime.date, end_date: datetime.date, room_list: list):
+    for room in room_list:
+        room_amount = db.query(models.Room.quantity).filter(models.Room.id == room["room_id"]).first()
+        for amount in db.query(models.Room_order.amount).filter(
+            and_(
+                models.Room_order.room_id == room["room_id"],
+                models.Order.id == models.Room_order.order_id,
+                or_(
+                    end_date > models.Order.start_date,
+                    start_date < models.Order.end_date
+                )
+            )):
+            room_amount -= amount
+        if room_amount < room["amount"]:
+            return False
+    return True
 
 def get_coupon_with_id(db: Session, member_id: int):
     return db.query(models.Coupon).filter(models.Coupon.member_id == member_id).all()
@@ -356,3 +356,10 @@ def get_historical_order(db: Session, member_id: int):
             total_price += price
         order_list.append({"hotel_name": hotel[0], "hotel_addr": hotel[1], "hotel_image": hotel[2], "rooms": room_list, "price": total_price, "date": (str(start_date) + "-" + str(end_date))})
     return order_list
+
+def room_filter(db: Session, shopping_cart: list):
+    rooms = []
+    for room in shopping_cart:
+        if room["amount"] > 0:
+            rooms.append(room)
+    return rooms

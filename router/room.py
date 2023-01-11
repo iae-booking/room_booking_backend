@@ -56,11 +56,11 @@ def place_order(shopping_cart: list, order_info: schemas.Order, db: Session = De
     if order_info.start_date >= order_info.end_date:
         raise HTTPException(status_code=400, detail="Date error")
     try:
-        for room in shopping_cart:
-            if crud.check_rooms(db, order_info.start_date, order_info.end_date, room['room_id']) is False:
-                raise HTTPException(status_code=400, detail="Room is booked")
+        nonzero_room = crud.room_filter(db, shopping_cart)
+        if crud.check_rooms(db, order_info.start_date, order_info.end_date, nonzero_room) is False:
+            raise HTTPException(status_code=400, detail="Room is booked")
         order_id = crud.place_order(db, order_info, member_id)
-        order_result = crud.place_room_order(db, shopping_cart, order_id)
+        order_result = crud.place_room_order(db, nonzero_room, order_id)
         order_result.update(order_info)
         shopping_cart.append(order_result)
         return shopping_cart

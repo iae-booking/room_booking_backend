@@ -106,10 +106,10 @@ class GetSearchdata(OrmBaseModel):
     hotel_name: str
     hotel_image: Union[List[bytes], None] = None
     hotel_location: str
+    hotel_introduction: str
     room_name: str
     room_price: int
     left: int
-    room_introduction: str
 
 class Order(OrmBaseModel):
     start_date: date
