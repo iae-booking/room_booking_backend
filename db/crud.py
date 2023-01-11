@@ -254,8 +254,12 @@ def search_rooms(db: Session, place: str, number_of_people: int, start_date: dat
                 models.Room_order.room_id == room_id[id],
                 models.Order.id == models.Room_order.order_id,
                 or_(
-                    end_date > models.Order.start_date,
-                    start_date < models.Order.end_date
+                    and_(
+                        end_date > models.Order.start_date,
+                        models.Order.start_date >= start_date),
+                    and_(
+                        end_date >= models.Order.end_date,
+                        models.Order.end_date > start_date)
                 )
             )):
             room_amount[id] -= amount
@@ -292,28 +296,33 @@ def place_room_order(db: Session, room_list: list, order_id: int):
     total_price = {'save': 0,'price': 0}
     for room in room_list:
         for price, original_price in db.query(models.Room.price, models.Room.original_price).filter(models.Room.id == room['room_id']):
-            db_item = models.Room_order(room_id=room['room_id'], amount=room['amount'], order_id=order_id, fee=(price['price'] * room['amount']))
+            db_item = models.Room_order(room_id=room['room_id'], amount=room['amount'], order_id=order_id, fee=(price * room['amount']))
             db.add(db_item)
             db.commit()
             db.refresh(db_item)
-            total_price['save'] += (original_price['original_price'] - price['price']) * room['amount']
-            total_price['price'] += price['price'] * room['amount']
+            total_price['save'] += (original_price - price) * room['amount']
+            total_price['price'] += price * room['amount']
             break
     return total_price
 
 def check_rooms(db: Session, start_date: datetime.date, end_date: datetime.date, room_list: list):
     for room in room_list:
-        room_amount = db.query(models.Room.quantity).filter(models.Room.id == room["room_id"]).first()
+        room_amount = db.query(models.Room.quantity).filter(models.Room.id == room["room_id"]).first()["quantity"]
         for amount in db.query(models.Room_order.amount).filter(
             and_(
                 models.Room_order.room_id == room["room_id"],
                 models.Order.id == models.Room_order.order_id,
                 or_(
-                    end_date > models.Order.start_date,
-                    start_date < models.Order.end_date
+                    and_(
+                        end_date > models.Order.start_date,
+                        models.Order.start_date >= start_date),
+                    and_(
+                        end_date >= models.Order.end_date,
+                        models.Order.end_date > start_date)
                 )
-            )):
-            room_amount -= amount
+            )
+        ):
+            room_amount -= amount["amount"]
         if room_amount < room["amount"]:
             return False
     return True

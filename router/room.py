@@ -62,8 +62,8 @@ def place_order(shopping_cart: list, order_info: schemas.Order, db: Session = De
         order_id = crud.place_order(db, order_info, member_id)
         order_result = crud.place_room_order(db, nonzero_room, order_id)
         order_result.update(order_info)
-        shopping_cart.append(order_result)
-        return shopping_cart
+        nonzero_room.append(order_result)
+        return nonzero_room
     except:
         return {'status': 'fail'}
 
