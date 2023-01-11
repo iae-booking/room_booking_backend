@@ -363,7 +363,10 @@ def get_historical_order(db: Session, member_id: int):
             hotel = [str(hotel_name), str(hotel_city + hotel_region + hotel_road_and_number), hotel_image]
             room_list += str(room_name) + str(amount) + '間'
             total_price += price
-        order_list.append({"hotel_name": hotel[0], "hotel_addr": hotel[1], "hotel_image": hotel[2], "rooms": room_list, "price": total_price, "date": (str(start_date) + "-" + str(end_date))})
+        try:
+            order_list.append({"hotel_name": hotel[0], "hotel_addr": hotel[1], "hotel_image": hotel[2], "rooms": room_list, "price": total_price, "date": (str(start_date) + "-" + str(end_date))})
+        except:
+            None
     return order_list
 
 def room_filter(db: Session, shopping_cart: list):
