@@ -265,9 +265,9 @@ def search_rooms(db: Session, place: str, number_of_people: int, start_date: dat
             del(room_amount[id])
     hotel_ids = []
     for num in range(len(room_id)):
-        for hotel_id, member_id, hotel_name, hotel_image, hotel_city, hotel_region, hotel_road_and_number, room_name, room_price in \
+        for hotel_id, member_id, hotel_name, hotel_image, hotel_city, hotel_region, hotel_road_and_number, room_name, room_price, room_introduction in \
             db.query(models.Hotel.id, models.Member.member_id, models.Hotel.hotel_name, models.Hotel.images, models.Hotel.city,
-                     models.Hotel.region, models.Hotel.road_and_number, models.Room.room_name, models.Room.price)\
+                     models.Hotel.region, models.Hotel.road_and_number, models.Room.room_name, models.Room.price, models.Room.introduction)\
                     .filter(
                 and_(
                     models.Hotel.id == models.Room.hotel_id,
@@ -276,7 +276,7 @@ def search_rooms(db: Session, place: str, number_of_people: int, start_date: dat
                 hotel_ids.append(hotel_id)
                 result.append({"hotel_id": hotel_id, "member_id": member_id, "hotel_name": hotel_name, "hotel_image": hotel_image,
                                "hotel_location": hotel_city + hotel_region + hotel_road_and_number, "room_name": room_name,
-                               "room_price": room_price, "left": room_amount[num]})
+                               "room_price": room_price, "left": room_amount[num], "room_introduction": room_introduction})
             break
     return result
 

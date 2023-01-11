@@ -109,6 +109,7 @@ class GetSearchdata(OrmBaseModel):
     room_name: str
     room_price: int
     left: int
+    room_introduction: str
 
 class Order(OrmBaseModel):
     start_date: date
