@@ -263,14 +263,20 @@ def search_rooms(db: Session, place: str, number_of_people: int, start_date: dat
         if room_amount[id] == 0:
             del(room_id[id])
             del(room_amount[id])
-    for room in room_id:
+    hotel_ids = []
+    for num in range(len(room_id)):
         for hotel_id, member_id, hotel_name, hotel_image, hotel_city, hotel_region, hotel_road_and_number, room_name, room_price in \
-            db.query(models.Hotel.id, models.Member.member_id, models.Hotel.hotel_name, models.Hotel.images, models.Hotel.city, models.Hotel.region, models.Hotel.road_and_number, models.Room.room_name, models.Room.price)\
+            db.query(models.Hotel.id, models.Member.member_id, models.Hotel.hotel_name, models.Hotel.images, models.Hotel.city,
+                     models.Hotel.region, models.Hotel.road_and_number, models.Room.room_name, models.Room.price)\
                     .filter(
                 and_(
                     models.Hotel.id == models.Room.hotel_id,
-                    models.Room.id == room)):
-            result.append({"hotel_id": hotel_id, "member_id": member_id, "hotel_name": hotel_name, "hotel_image": hotel_image, "hotel_location": hotel_city + hotel_region + hotel_road_and_number, "room_name": room_name, "room_price": room_price})
+                    models.Room.id == room_id[num])):
+            if hotel_id not in hotel_ids:
+                hotel_ids.append(hotel_id)
+                result.append({"hotel_id": hotel_id, "member_id": member_id, "hotel_name": hotel_name, "hotel_image": hotel_image,
+                               "hotel_location": hotel_city + hotel_region + hotel_road_and_number, "room_name": room_name,
+                               "room_price": room_price, "left": room_amount[num]})
             break
     return result
 
@@ -338,15 +344,15 @@ def get_historical_order(db: Session, member_id: int):
         room_list = ''
         total_price = 0
         hotel = []
-        for hotel_name, hotel_city, hotel_region, hotel_road_and_number, room_name, amount, price in \
-                db.query(models.Hotel.hotel_name, models.Hotel.city, models.Hotel.region, models.Hotel.road_and_number, models.Room.room_name, models.Room_order.amount, models.Room_order.fee)\
+        for hotel_name, hotel_image, hotel_city, hotel_region, hotel_road_and_number, room_name, amount, price in \
+                db.query(models.Hotel.hotel_name, models.Hotel.images, models.Hotel.city, models.Hotel.region, models.Hotel.road_and_number, models.Room.room_name, models.Room_order.amount, models.Room_order.fee)\
             .filter(
             (and_(
                 (models.Room_order.order_id == order_id),
                 (models.Room.id == models.Room_order.room_id),
                 (models.Hotel.id == models.Room.hotel_id)))):
-            hotel = [str(hotel_name), str(hotel_city + hotel_region + hotel_road_and_number)]
+            hotel = [str(hotel_name), str(hotel_city + hotel_region + hotel_road_and_number), hotel_image]
             room_list += str(room_name) + str(amount) + '間'
             total_price += price
-        order_list.append({"hotel_name": hotel[0], "hotel_addr": hotel[1], "rooms": room_list, "price": total_price, "date": (str(start_date) + "-" + str(end_date))})
+        order_list.append({"hotel_name": hotel[0], "hotel_addr": hotel[1], "hotel_image": hotel[2], "rooms": room_list, "price": total_price, "date": (str(start_date) + "-" + str(end_date))})
     return order_list

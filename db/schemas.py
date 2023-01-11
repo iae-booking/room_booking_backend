@@ -108,6 +108,7 @@ class GetSearchdata(OrmBaseModel):
     hotel_location: str
     room_name: str
     room_price: int
+    left: int
 
 class Order(OrmBaseModel):
     start_date: date
@@ -140,6 +141,7 @@ class UsedCoupon(OrmBaseModel):
 class historical_order(OrmBaseModel):
     hotel_name: str
     hotel_addr: str
+    hotel_image: Union[List[bytes], None] = None
     rooms: str
     price: int
     date: str
